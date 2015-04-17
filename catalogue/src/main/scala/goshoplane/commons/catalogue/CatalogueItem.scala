@@ -55,11 +55,23 @@ object CatalogueItem {
 }
 
 
+
+
+/////////////////////////////////////////////////////////////////////////////
+////////////////////// Individual Catalogue items ///////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
 @Message
 case class ClothingItem(
   itemId: CatalogueItemId,
+  itemType: ItemType,
+  itemTypeGroups: ItemTypeGroups,
+  namedType: NamedType,
+  productTitle: ProductTitle,
   colors: Colors,
   sizes: Sizes,
   brand: Brand,
   clothingType: ClothingType,
-  description: Description) extends CatalogueItem
+  description: Description,
+  price: Price) extends CatalogueItem

@@ -60,6 +60,7 @@ struct UserInfo {
 
 enum ItemType {
   ApparelMen = 1;
+  Unknown    = 100;
 }
 
 struct StoreId {
