@@ -88,6 +88,7 @@ object CommonsBuild extends Build with Libraries {
     libraryDependencies ++= Seq(
     ) ++ Libs.msgpack
       ++ Libs.scalaz
+      ++ Libs.kafka
   ).dependsOn(core)
 
 }

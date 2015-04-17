@@ -78,9 +78,10 @@ struct CatalogueItemId {
 }
 
 enum SerializerType {
-  MSGPCK = 1;
-  JSON   = 2;
-  Kryo   = 3;
+  MSGPCK  = 1;
+  JSON    = 2;
+  Kryo    = 3;
+  Unknown = 100;
 }
 
 struct SerializerId {

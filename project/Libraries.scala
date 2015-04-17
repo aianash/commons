@@ -46,12 +46,18 @@ trait Libraries {
     val cassandraCore   = "2.1.4"
     val phantom         = "1.5.0"
     val play            = "2.3.8"
+    val kafka           = "0.8.2.0"
     val researchpaperParser = "1.0"
   }
 
 
 
   object Libs {
+
+    val kafka = Seq (
+      "org.apache.kafka" % "kafka-clients" % Version.kafka,
+      "org.apache.kafka" %% "kafka" % Version.kafka )
+
 
     val playJson = Seq (
       "com.typesafe.play" %% "play-json" % Version.play)
