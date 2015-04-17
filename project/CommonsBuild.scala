@@ -55,7 +55,7 @@ object CommonsBuild extends Build with Libraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core)
+  ) aggregate (core, catalogue)
 
 
 
@@ -64,7 +64,6 @@ object CommonsBuild extends Build with Libraries {
     base = file("core"),
     settings = Project.defaultSettings ++
       sharedSettings ++
-      SbtStartScript.startScriptForClassesSettings ++
       ScroogeSBT.newSettings
   ).settings(
     name := "commons-core",
@@ -75,7 +74,20 @@ object CommonsBuild extends Build with Libraries {
       ++ Libs.finagleThrift
       ++ Libs.libThrift
       ++ Libs.akka
-      ++ Libs.scaldi
-      ++ Libs.fastutil
   )
+
+
+  lazy val catalogue = Project(
+    id = "commons-catalogue",
+    base = file("catalogue"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-catalogue",
+
+    libraryDependencies ++= Seq(
+    ) ++ Libs.msgpack
+      ++ Libs.scalaz
+  ).dependsOn(core)
+
 }
