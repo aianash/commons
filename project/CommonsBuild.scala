@@ -74,6 +74,7 @@ object CommonsBuild extends Build with Libraries {
       ++ Libs.finagleThrift
       ++ Libs.libThrift
       ++ Libs.akka
+      ++ Libs.phantom
   )
 
 
