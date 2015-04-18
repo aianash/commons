@@ -15,6 +15,10 @@ import scalaz.syntax.monad._
 
 sealed trait CatalogueItem extends Serializable {
   def itemId: CatalogueItemId
+  def itemType: ItemType
+  def itemTypeGroups: ItemTypeGroups
+  def namedType: NamedType
+  def productTitle: ProductTitle
 }
 
 
@@ -72,6 +76,5 @@ case class ClothingItem(
   colors: Colors,
   sizes: Sizes,
   brand: Brand,
-  clothingType: ClothingType,
   description: Description,
   price: Price) extends CatalogueItem

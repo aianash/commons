@@ -19,7 +19,7 @@ class ClothingItemTemplate(
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(12)
+      packer.writeArrayBegin(11)
       packer.write(from.itemId.storeId.stuid)
       packer.write(from.itemId.cuid)
       packer.write(from.itemType.value)
@@ -29,7 +29,6 @@ class ClothingItemTemplate(
       colorsTemplate.write(packer, from.colors, required)
       sizesTemplate.write(packer, from.sizes,  required)
       packer.write(from.brand.name)
-      packer.write(from.clothingType.value)
       packer.write(from.description.text)
       packer.write(from.price.value)
       packer.writeArrayEnd
@@ -52,7 +51,6 @@ class ClothingItemTemplate(
       val colors         = colorsTemplate.read(unpacker, null.asInstanceOf[Colors], required)
       val sizes          = sizesTemplate.read(unpacker, null.asInstanceOf[Sizes], required)
       val brand          = unpacker.read(Templates.TString)
-      val clothingType   = unpacker.read(Templates.TString)
       val description    = unpacker.read(Templates.TString)
       val price          = unpacker.read(Templates.TFloat)
       unpacker.readArrayEnd
@@ -70,7 +68,6 @@ class ClothingItemTemplate(
         colors         = colors,
         sizes          = sizes,
         brand          = Brand(brand),
-        clothingType   = ClothingType(clothingType),
         description    = Description(description),
         price          = Price(price))
     }

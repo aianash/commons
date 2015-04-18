@@ -13,6 +13,7 @@ typedef double Longitude
 typedef string Email
 typedef string Timezone
 typedef string FBToken
+typedef string PhoneNumber
 
 
 enum Locale {
@@ -41,6 +42,31 @@ struct UserAvatar {
   3: optional Url large;
 }
 
+struct StoreAvatar {
+  1: optional Url small;
+  2: optional Url medium;
+  3: optional Url large;
+}
+
+struct PhoneContact {
+  1: list<PhoneNumber> numbers;
+}
+
+
+struct GPSLocation {
+  1: Latitude lat;
+  2: Longitude lng;
+}
+
+struct PostalAddress {
+  1: optional GPSLocation gpsLoc;
+  2: optional AddressTitle title;
+  3: optional AddressShort short;
+  4: optional AddressFull full;
+  5: optional Pincode pincode;
+  6: optional Country country;
+  7: optional City city;
+}
 
 struct FacebookInfo {
   1: UserId userId;
@@ -59,8 +85,8 @@ struct UserInfo {
 }
 
 enum ItemType {
-  ApparelMen = 1;
-  Unknown    = 100;
+  ClothingItem = 1;
+  Unknown      = 100;
 }
 
 struct StoreId {
@@ -70,6 +96,35 @@ struct StoreId {
 struct StoreName {
   1: optional string full;
   2: optional string handle;
+}
+
+enum StoreInfoField {
+  Name      = 1;
+  ItemTypes = 2;
+  Address   = 3;
+  Avatar    = 4;
+  Contacts  = 5;
+}
+
+struct StoreInfo {
+  1: optional StoreName name;
+  2: optional list<ItemType> itemTypes;
+  3: optional PostalAddress address;
+  4: optional StoreAvatar avatar;
+  5: optional Email email;
+  6: optional PhoneContact phone;
+}
+
+enum StoreType {
+  Showroom             = 1;
+  MultiBrandedShowroom = 2;
+  Unknown              = 100;
+}
+
+struct Store {
+  1: StoreId storeId;
+  3: StoreType storeType;
+  2: optional StoreInfo info;
 }
 
 struct CatalogueItemId {
@@ -84,6 +139,13 @@ enum SerializerType {
   Unknown = 100;
 }
 
+enum CatalogeItemDetailType {
+  Summary  = 1;
+  Detail   = 2;
+  Complete = 3;
+}
+
+
 struct SerializerId {
   1: string sid;
   2: SerializerType stype;
@@ -93,19 +155,4 @@ struct SerializedCatalogueItem {
   1: CatalogueItemId itemId;
   2: SerializerId serializerId;
   3: binary stream;
-}
-
-struct GPSLocation {
-  1: Latitude lat;
-  2: Longitude lng;
-}
-
-struct PostalAddress {
-  1: optional GPSLocation gpsLoc;
-  2: optional AddressTitle title;
-  3: optional AddressShort short;
-  4: optional AddressFull full;
-  5: optional Pincode pincode;
-  6: optional Country country;
-  7: optional City city;
 }
