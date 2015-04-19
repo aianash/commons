@@ -124,7 +124,7 @@ enum StoreType {
 struct Store {
   1: StoreId storeId;
   3: StoreType storeType;
-  2: optional StoreInfo info;
+  2: StoreInfo info;
 }
 
 struct CatalogueItemId {
