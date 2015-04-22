@@ -17,7 +17,9 @@ class SerializedCatalogueItemTemplate extends AbstractTemplate[SerializedCatalog
     } else {
       val byteBuffer = from.stream
       val bytes = Array.ofDim[Byte](byteBuffer.remaining)
+      byteBuffer.mark
       byteBuffer.get(bytes)
+      byteBuffer.reset
 
       packer.writeArrayBegin(bytes.size + 4)
       packer.write(from.itemId.storeId.stuid)
@@ -54,9 +56,9 @@ class SerializedCatalogueItemTemplate extends AbstractTemplate[SerializedCatalog
       unpacker.readArrayEnd
 
       SerializedCatalogueItem(
-        itemId = CatalogueItemId(storeId = StoreId(stuid), cuid = cuid),
+        itemId       = CatalogueItemId(storeId = StoreId(stuid), cuid = cuid),
         serializerId = SerializerId(sid = sid, stype = stype),
-        stream = stream)
+        stream       = stream)
     }
   }
 }

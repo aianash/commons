@@ -33,8 +33,10 @@ object CatalogueItem {
       case SerializerId("clothing-item", SerializerType.Msgpck) =>
         val stream = serializedItem.stream
         val bytes  = Array.ofDim[Byte](stream.remaining)
+        stream.mark
         stream.get(bytes)
-        stream.rewind
+        stream.reset
+
         ScalaMessagePack.messagePack.read(bytes, clothingItemTemplate).some
 
 
