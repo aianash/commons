@@ -27,7 +27,7 @@ trait Libraries {
     val commonsLang     = "2.6"
     val provoz          = "0.0.1"
     val hemingway       = "1.0.0"
-    val libThrift       = "0.9.2" // [check update to] 0.9.1
+    val libThrift       = "0.9.2"
     val bijection       = "0.6.2"
     val scrooge         = "3.17.0"
     val commonsConfig   = "1.9"

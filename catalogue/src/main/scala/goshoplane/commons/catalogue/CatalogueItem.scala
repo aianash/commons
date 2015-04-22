@@ -31,10 +31,12 @@ object CatalogueItem {
     serializedItem.serializerId match {
 
       case SerializerId("clothing-item", SerializerType.Msgpck) =>
-        val bytes = Array.ofDim[Byte](serializedItem.stream.remaining)
-        serializedItem.stream.get(bytes)
+        val stream = serializedItem.stream
+        val bytes  = Array.ofDim[Byte](stream.remaining)
+        stream.get(bytes)
+        stream.rewind
+        ScalaMessagePack.messagePack.read(bytes, clothingItemTemplate).some
 
-        ScalaMessagePack.messagePack.read(bytes, clothingItemTemplate).some // [ClothingItem](bytes).some
 
       case _ => None
     }
@@ -45,7 +47,8 @@ object CatalogueItem {
     catalogueItem match {
 
       case ci: ClothingItem =>
-        val stream       = ByteBuffer.wrap(ScalaMessagePack.writeT(ci))
+        val bytes        = ScalaMessagePack.writeT(ci)
+        val stream       = ByteBuffer.wrap(bytes)
         val serializerId = SerializerId("clothing-item", SerializerType.Msgpck)
 
         SerializedCatalogueItem(
