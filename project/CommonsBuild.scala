@@ -28,7 +28,7 @@ object CommonsBuild extends Build with Libraries {
     javaOptions += "-Xmx2500M",
 
     resolvers ++= Seq(
-      "ReaderDeck Releases"    at "http://repo.readerdeck.com/artifactory/readerdeck-releases",
+      // "ReaderDeck Releases"    at "http://repo.readerdeck.com/artifactory/readerdeck-releases",
       "anormcypher"            at "http://repo.anormcypher.org/",
       "Akka Repository"        at "http://repo.akka.io/releases",
       "Spray Repository"       at "http://repo.spray.io/",
@@ -55,7 +55,7 @@ object CommonsBuild extends Build with Libraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core)
+  ) aggregate (core, catalogue)
 
 
 
@@ -64,7 +64,6 @@ object CommonsBuild extends Build with Libraries {
     base = file("core"),
     settings = Project.defaultSettings ++
       sharedSettings ++
-      SbtStartScript.startScriptForClassesSettings ++
       ScroogeSBT.newSettings
   ).settings(
     name := "commons-core",
@@ -75,7 +74,23 @@ object CommonsBuild extends Build with Libraries {
       ++ Libs.finagleThrift
       ++ Libs.libThrift
       ++ Libs.akka
-      ++ Libs.scaldi
+      ++ Libs.phantom
       ++ Libs.fastutil
   )
+
+
+  lazy val catalogue = Project(
+    id = "commons-catalogue",
+    base = file("catalogue"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-catalogue",
+
+    libraryDependencies ++= Seq(
+    ) ++ Libs.msgpack
+      ++ Libs.scalaz
+      ++ Libs.kafka
+  ).dependsOn(core)
+
 }
