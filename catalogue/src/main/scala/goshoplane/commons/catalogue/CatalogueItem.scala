@@ -2,6 +2,8 @@ package goshoplane.commons.catalogue
 
 import java.nio.ByteBuffer
 
+import scala.collection.mutable.{Map => MutableMap}
+
 import com.goshoplane.common._
 
 import org.msgpack.ScalaMessagePack
@@ -19,6 +21,9 @@ sealed trait CatalogueItem extends Serializable {
   def itemTypeGroups: ItemTypeGroups
   def namedType: NamedType
   def productTitle: ProductTitle
+  def productImage: ProductImage
+
+  def attributesMap: Map[String, String]
 }
 
 
@@ -78,8 +83,64 @@ case class ClothingItem(
   itemTypeGroups: ItemTypeGroups,
   namedType: NamedType,
   productTitle: ProductTitle,
+  productImage: ProductImage,
+  // attributes
   colors: Colors,
   sizes: Sizes,
   brand: Brand,
   description: Description,
-  price: Price) extends CatalogueItem
+  price: Price,
+  fabric: ApparelFabric,
+  fit: ApparelFit,
+  style: ApparelStyle) extends CatalogueItem {
+
+  lazy val attributesMap = Map(
+    "colors"      -> colors.values.mkString(","),
+    "sizes"       -> sizes.values.mkString(","),
+    "brand"       -> brand.name,
+    "description" -> description.text,
+    "price"       -> price.value.toString,
+    "fabric"      -> fabric.fabric,
+    "fit"         -> fit.fit,
+    "style"       -> style.style
+  )
+
+}
+
+object ClothingItem {
+
+  def create(itemId: CatalogueItemId,
+             itemType: ItemType,
+             itemTypeGroups: ItemTypeGroups,
+             namedType: NamedType,
+             productTitle: ProductTitle,
+             productImage: ProductImage,
+             attributes: Map[String, String]) = {
+
+    val colors      = attributes.get("colors").map(_.split(",").toSeq).getOrElse(Seq.empty[String])
+    val sizes       = attributes.get("sizes") .map(_.split(",").toSeq).getOrElse(Seq.empty[String])
+    val brand       = attributes.get("brand").getOrElse("unknown")
+    val description = attributes.get("description").getOrElse("")
+    val price       = attributes.get("price").map(_.toFloat).getOrElse(-1.0f)
+    val fabric      = attributes.get("fabric").getOrElse("unknown")
+    val fit         = attributes.get("fit").getOrElse("unknown")
+    val style       = attributes.get("style").getOrElse("unknown")
+
+    ClothingItem(
+      itemId         = itemId,
+      itemType       = itemType,
+      itemTypeGroups = itemTypeGroups,
+      namedType      = namedType,
+      productTitle   = productTitle,
+      productImage   = productImage,
+      colors         = Colors(colors),
+      sizes          = Sizes(sizes),
+      brand          = Brand(brand),
+      description    = Description(description),
+      price          = Price(price),
+      fabric         = ApparelFabric(fabric),
+      fit            = ApparelFit(fit),
+      style          = ApparelStyle(style)
+    )
+  }
+}
