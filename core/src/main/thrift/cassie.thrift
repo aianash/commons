@@ -14,5 +14,5 @@ service Cassie {
 
   common.StoreId createOrUpdateStore(1:common.StoreType storeType, 2:common.StoreInfo info) throws (1:CassieException cex);
   common.Store getStore(1:common.StoreId storeId, 2:list<common.StoreInfoField> fields) throws (1:CassieException cex);
-
+  list<common.Store> getStores(1:list<common.StoreId> storeId, 2:list<common.StoreInfoField> fields) throws (1:CassieException ex);
 }
