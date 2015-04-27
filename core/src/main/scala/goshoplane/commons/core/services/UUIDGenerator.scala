@@ -85,7 +85,7 @@ class UUIDGenerator(serviceId: Long, datacenterId: Long) extends Actor with Acto
 }
 
 
-case class NextId(idFor: String) extends Replyable[Long]
+case class NextId(idFor: String) extends Replyable[Option[Long]]
 
 object UUIDGenerator {
 
