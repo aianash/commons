@@ -13,7 +13,9 @@ import scalaz._, Scalaz._
 import scalaz.std.option._
 import scalaz.syntax.monad._
 
+import play.api.libs.json._
 
+import JsonCombinators._
 
 sealed trait CatalogueItem extends Serializable {
   def itemId: CatalogueItemId
@@ -24,6 +26,7 @@ sealed trait CatalogueItem extends Serializable {
   def productImage: ProductImage
 
   def attributesMap: Map[String, String]
+  def json: JsValue
 }
 
 
@@ -105,6 +108,8 @@ case class ClothingItem(
     "style"       -> style.style
   )
 
+
+  lazy val json = Json.toJson(this)
 }
 
 object ClothingItem {
