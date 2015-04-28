@@ -52,7 +52,7 @@ struct SearchResultStore {
   1: common.StoreId storeId;
   2: common.StoreType storeType;
   3: common.StoreInfo info;
-  4: list<Json> items;
+  4: list<common.JsonCatalogueItem> items;
 }
 
 
