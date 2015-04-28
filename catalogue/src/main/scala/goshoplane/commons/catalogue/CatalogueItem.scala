@@ -38,7 +38,7 @@ object CatalogueItem {
   def decode(serializedItem: SerializedCatalogueItem): Option[CatalogueItem] =
     serializedItem.serializerId match {
 
-      case SerializerId("clothing-item", SerializerType.Msgpck) =>
+      case SerializerId("clothing-item-1", SerializerType.Msgpck) =>
         val stream = serializedItem.stream
         val bytes  = Array.ofDim[Byte](stream.remaining)
         stream.mark
@@ -52,6 +52,18 @@ object CatalogueItem {
     }
 
 
+  def decode(jsonItem: JsonCatalogueItem): Option[CatalogueItem] =
+    jsonItem.versionId match {
+
+      case "clothing-item-1" =>
+        Json.parse(jsonItem.json).validate[ClothingItem] match {
+          case JsSuccess(clothingItem, _) => clothingItem.some
+          case JsError(_) => None
+        }
+
+      case _ => None
+    }
+
 
   def encode(catalogueItem: CatalogueItem): Option[SerializedCatalogueItem] =
     catalogueItem match {
@@ -59,7 +71,7 @@ object CatalogueItem {
       case ci: ClothingItem =>
         val bytes        = ScalaMessagePack.writeT(ci)
         val stream       = ByteBuffer.wrap(bytes)
-        val serializerId = SerializerId("clothing-item", SerializerType.Msgpck)
+        val serializerId = SerializerId("clothing-item-1", SerializerType.Msgpck)
 
         SerializedCatalogueItem(
           itemId       = ci.itemId,
@@ -68,6 +80,21 @@ object CatalogueItem {
 
       case _ => None
     }
+
+
+  def asJsonItem(catalogueItem: CatalogueItem): Option[JsonCatalogueItem] =
+    scala.util.Try({
+      catalogueItem match {
+        case ci: ClothingItem =>
+          JsonCatalogueItem(
+            itemId    = ci.itemId,
+            versionId = "clothing-item-1",
+            json      = ci.json.toString).some
+
+        case _ => None
+      }
+    }).toOption.flatMap(identity)
+
 
 }
 

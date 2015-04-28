@@ -134,8 +134,7 @@ struct CatalogueItemId {
 
 enum SerializerType {
   MSGPCK  = 1;
-  JSON    = 2;
-  Kryo    = 3;
+  Kryo    = 2;
   Unknown = 100;
 }
 
@@ -155,4 +154,10 @@ struct SerializedCatalogueItem {
   1: CatalogueItemId itemId;
   2: SerializerId serializerId;
   3: binary stream;
+}
+
+struct JsonCatalogueItem {
+  1: CatalogueItemId itemId;
+  2: string versionId;
+  3: string json;
 }
