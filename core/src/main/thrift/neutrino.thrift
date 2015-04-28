@@ -7,6 +7,7 @@ include 'search.thrift'
 namespace java com.goshoplane.neutrino.service
 namespace js neutrino.service
 
+typedef string Json
 exception NeutrinoException {
   1: string message;
 }
@@ -51,7 +52,7 @@ struct SearchResultStore {
   1: common.StoreId storeId;
   2: common.StoreType storeType;
   3: common.StoreInfo info;
-  4: list<common.SerializedCatalogueItem> items;
+  4: list<Json> items;
 }
 
 
