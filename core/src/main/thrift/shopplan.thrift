@@ -29,7 +29,7 @@ struct BucketStore {
   1: common.StoreId storeId;
   2: common.StoreType storeType;
   3: common.StoreInfo info;
-  4: optional list<common.SerializedCatalogueItem> catalogueItems;
+  4: optional list<common.JsonCatalogueItem> catalogueItems;
 }
 
 enum ShopPlanStoreField {
@@ -47,7 +47,7 @@ struct ShopPlanStore {
   2: DestinationId destId;
   3: common.StoreType storeType;
   4: common.StoreInfo info
-  5: optional list<common.SerializedCatalogueItem> catalogueItems;
+  5: optional list<common.JsonCatalogueItem> catalogueItems;
   6: optional list<common.CatalogueItemId> itemIds;
 }
 

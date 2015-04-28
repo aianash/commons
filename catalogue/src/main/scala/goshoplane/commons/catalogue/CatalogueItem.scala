@@ -96,6 +96,8 @@ object CatalogueItem {
     }).toOption.flatMap(identity)
 
 
+  def asJsonItem(catalogueItem: SerializedCatalogueItem): Option[JsonCatalogueItem] =
+    decode(catalogueItem).flatMap(asJsonItem(_))
 }
 
 
