@@ -12,10 +12,10 @@ object JsonCombinators {
   import Reads._
 
   val storeIdReads: Reads[StoreId] =
-    (__ \ "stuid").read[Long].map(StoreId(_))
+    (__ \ "stuid").read[String].map(id => StoreId(id.toLong))
 
   val storeIdWrites: Writes[StoreId] =
-    (__ \ "stuid").write[Long].contramap[StoreId](_.stuid)
+    (__ \ "stuid").write[String].contramap[StoreId](_.stuid.toString)
 
   implicit val storeIdFormat: Format[StoreId] =
     Format(storeIdReads, storeIdWrites)
@@ -24,13 +24,13 @@ object JsonCombinators {
 
   val catalogueItemIdReads: Reads[CatalogueItemId] = (
     (__ \ "storeId").read[StoreId] ~
-    (__ \ "ctuid")  .read[Long]
+    (__ \ "cuid")   .read[String].map(_.toLong)
   )(CatalogueItemId.apply _)
 
   val catalogueItemIdWrites: Writes[CatalogueItemId] = (
     (__ \ "storeId").write[StoreId] ~
-    (__ \ "ctuid")  .write[Long]
-  ) { cid: CatalogueItemId => (cid.storeId, cid.cuid)}
+    (__ \ "cuid")   .write[String]
+  ) { cid: CatalogueItemId => (cid.storeId, cid.cuid.toString) }
 
   implicit val catalogueItemIdFormat: Format[CatalogueItemId] =
     Format(catalogueItemIdReads, catalogueItemIdWrites)
@@ -112,9 +112,9 @@ object JsonCombinators {
 
 
   val productImageReads: Reads[ProductImage] = (
-    (__ \ "small").read[String] ~
+    (__ \ "small") .read[String] ~
     (__ \ "medium").read[String] ~
-    (__ \ "large").read[String]
+    (__ \ "large") .read[String]
   )(ProductImage.apply _)
 
   val productImageWrites: Writes[ProductImage] = (
