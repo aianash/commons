@@ -91,6 +91,7 @@ object CommonsBuild extends Build with Libraries {
     ) ++ Libs.msgpack
       ++ Libs.scalaz
       ++ Libs.kafka
+      ++ Libs.playJson
   ).dependsOn(core)
 
 }
