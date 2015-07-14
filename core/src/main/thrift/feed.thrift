@@ -47,11 +47,21 @@ struct PosterAdPost {
   3: PosterAd poster;
 }
 
+struct StoreAdPost {
+  1: PostId postId;
+  2: StreamIndex index;
+  3: common.StoreId storeId;
+  4: common.StoreName storeName;
+  5: common.PostalAddress storeAddress;
+  6: PosterAd storePoster; 
+}
+
 
 struct Feed {
   1: list<OfferPost> offerPosts;
   2: list<PosterAdPost> posterAdPosts;
-  3: PageIndex page;
+  3: list<StoreAdPost> storeAdPosts;
+  4: PageIndex page;
 }
 
 
