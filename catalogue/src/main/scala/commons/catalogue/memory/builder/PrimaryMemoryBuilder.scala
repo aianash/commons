@@ -1,6 +1,7 @@
-package commons.catalogue.memory
+package commons.catalogue.memory.builder
 
 import commons.catalogue.attributes.{FixedSizeAttribute, VariableSizeAttribute}
+import commons.catalogue.memory.{Memory, PrimaryMemory}
 
 
 /** Buffer for Primary Memory
@@ -9,28 +10,28 @@ import commons.catalogue.attributes.{FixedSizeAttribute, VariableSizeAttribute}
   * @constructor Create a new instance of Primary Memory Buffer
   * with the given number of segments
   */
-private[catalogue] class PrimaryMemoryBuffer(numSegments: Int)
-  extends MemoryBuffer(numSegments) {
+private[catalogue] class PrimaryMemoryBuilder(numSegments: Int)
+  extends MemoryBuilder(numSegments) {
 
   /** @inheritdoc
     *
     * @param headLayout   head layout for the segment
     */
-  def begin(headLayout: MemoryBuffer.HeadLayout) {
-    mkBasicSegment(headLayout, headLayout.PRIMARY_SIZE_BYTES)
+  def begin(numAttrs: Int, primaryHeadSize: Int) {
+    mkBasicSegment(primaryHeadSize)
   }
 
   /** @inheritdoc
     *
     * @note Cannot pass null for attribute
     */
-  def writeAttr(attribute: VariableSizeAttribute, attrIdx: Int) {
+  def writeAttr(attribute: VariableSizeAttribute, attrIdx: Int, primaryOffset: Int) {
     if(attribute != null) { // write attribute to this segment
       // 1. word align current segment's pos
       // 2. calcualte offset as in underlying array and put in head section
       // 3. write the attribute at the current pos
       pos = (pos + 7) & ~7
-      putIntAt(headLayout.primaryOffsetFor(attrIdx), udrlygNxtSgmtOff + pos)
+      putIntAt(primaryOffset, udrlygNxtSgmtOff + pos)
       attribute.write(this)
     } else throw new IllegalArgumentException("Variable attribute cannot be null in PrimaryMemory")
   }
@@ -39,9 +40,9 @@ private[catalogue] class PrimaryMemoryBuffer(numSegments: Int)
     *
     * @note Cannot pass null for attribute
     */
-  def writeAttr(attribute: FixedSizeAttribute, attrIdx: Int) {
+  def writeAttr(attribute: FixedSizeAttribute, attrIdx: Int, primaryOffset: Int) {
     if(attribute != null) {
-      attribute.writeAt(this, headLayout.primaryOffsetFor(attrIdx))
+      attribute.writeAt(this, primaryOffset)
     } else throw new IllegalArgumentException("Fixed Size attribute cannot be null in PrimaryMemory")
   }
 
