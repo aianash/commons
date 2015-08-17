@@ -1,6 +1,6 @@
 package commons.catalogue.attributes
 
-import commons.catalogue.memory.{MemoryBuffer, Memory}
+import commons.catalogue.memory.builder.MemoryBuilder
 
 
 /**
@@ -28,7 +28,7 @@ trait FixedSizeAttribute extends Attribute {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  private[catalogue] def writeAt(buffer: MemoryBuffer, position: Int): Unit
+  private[catalogue] def writeAt(builder: MemoryBuilder, position: Int): Unit
 
 }
 
@@ -45,13 +45,13 @@ trait VariableSizeAttribute extends Attribute {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  private[catalogue] def write(buffer: MemoryBuffer): Unit
+  private[catalogue] def write(builder: MemoryBuilder): Unit
 
 }
 
 
 trait VariableSizeAttributeConstants {
-  private[catalogue] val HEAD_SIZE_BYTES = Memory.POINTER_SIZE_BYTES
+  private[catalogue] val HEAD_SIZE_BYTES = MemoryBuilder.POSITION_SIZE_BYTES
 }
 
 trait FixedSizeAttributeConstants {

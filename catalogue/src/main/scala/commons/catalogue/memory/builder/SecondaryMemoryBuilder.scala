@@ -1,6 +1,9 @@
-package commons.catalogue.memory
+package commons.catalogue.memory.builder
 
+import commons.core.util.UnsafeUtil
 import commons.catalogue.attributes.{FixedSizeAttribute, VariableSizeAttribute}
+import commons.catalogue.memory.{Memory, SecondaryMemory, PrimaryMemory}
+
 
 /** Buffer for Secondary Memory
   * @inheritdoc
@@ -10,18 +13,19 @@ import commons.catalogue.attributes.{FixedSizeAttribute, VariableSizeAttribute}
   *
   * @param primary    primary memory to inherit instance from
   */
-private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegments: Int)
-  extends MemoryBuffer(numSegments) {
+private[catalogue] class SecondaryMemoryBuilder(primary: PrimaryMemory, numSegments: Int)
+  extends MemoryBuilder(numSegments) {
 
-  import Memory._
+  import MemoryBuilder._
+  import SecondaryMemoryBuilder._
 
   /** @inheritdoc
     * Also init inheritance bit with zero
     *
     * @param headLayout   head layout for the segment
     */
-  def begin(headLayout: MemoryBuffer.HeadLayout) {
-    mkBasicSegment(headLayout, headLayout.SECONDARY_SIZE_BYTES)
+  def begin(numAttrs: Int, primaryHeadSize: Int) {
+    mkBasicSegment(INHERITANCE_BITS_SIZE_BYTES + (numAttrs << POSITION_SIZE_EXP))
     putLongAt(0, 0L) // by default all inheritance bits are zero
                      // Note: this may not be necessary
   }
@@ -34,13 +38,13 @@ private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegmen
     * @param attribute    variable sized attribute
     * @param attrIdx      attribute's index in head layout
     */
-  def writeAttr(attribute: VariableSizeAttribute, attrIdx: Int) {
+  def writeAttr(attribute: VariableSizeAttribute, attrIdx: Int, primaryOffset: Int) {
     val attrHeadOffset = INHERITANCE_BITS_SIZE_BYTES +
-                         (attrIdx << POINTER_SIZE_EXP)
+                         (attrIdx << POSITION_SIZE_EXP)
 
     if(attribute == null) {
       val primarySegmtOffset = primary.segmentOffset(segmentIdx)
-      val attrOffset = primary.getIntAt(primarySegmtOffset + headLayout.primaryOffsetFor(attrIdx))
+      val attrOffset = primary.getIntAt(primarySegmtOffset + primaryOffset)
       putIntAt(attrHeadOffset, attrOffset)
     } else {
       pos = (pos + 7) & ~7
@@ -51,7 +55,7 @@ private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegmen
   }
 
   /** @inheritdoc
-    * This writed fixed sized attribute in tail section unlike
+    * This writes fixed sized attribute in tail section unlike
     * primary memory buffer. Which writed in head section.
     *
     * This is necessary because attributes can be either inherited
@@ -65,12 +69,12 @@ private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegmen
     * @param attribute    fixed sized attribute
     * @param attrIdx      attribute's index in head layout
     */
-  def writeAttr(attribute: FixedSizeAttribute, attrIdx: Int) {
+  def writeAttr(attribute: FixedSizeAttribute, attrIdx: Int, primaryOffset: Int) {
     val attrHeadOffset = INHERITANCE_BITS_SIZE_BYTES +
-                         (attrIdx << POINTER_SIZE_EXP)
+                         (attrIdx << POSITION_SIZE_EXP)
 
     if(attribute == null) {
-      val attrOffset = primary.segmentOffset(segmentIdx) + headLayout.primaryOffsetFor(attrIdx)
+      val attrOffset = primary.segmentOffset(segmentIdx) + primaryOffset
       putIntAt(attrHeadOffset, attrOffset)
     } else {
       pos = (pos + 7) & ~7
@@ -95,6 +99,8 @@ private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegmen
 
 
   /** Sets not inherited in the segment's inheritance bits
+    * 0 stands for inherited
+    * 1 stands for not inherited
     *
     * @param attrIdx    attribute index
     */
@@ -102,5 +108,16 @@ private[catalogue] class SecondaryMemoryBuffer(primary: PrimaryMemory, numSegmen
     val newBits = (1 << attrIdx) | getLongAt(0)
     putLongAt(0, newBits)
   }
+
+}
+
+
+object SecondaryMemoryBuilder {
+
+  import UnsafeUtil._
+
+  // This size of 8 bytes can allow atleast 64 attributes
+  // to be inherited in a segment.
+  private[catalogue] val INHERITANCE_BITS_SIZE_BYTES = LONG_SIZE_BYTES
 
 }
