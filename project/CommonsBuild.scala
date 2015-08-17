@@ -20,7 +20,7 @@ object CommonsBuild extends Build with Libraries {
     organization := "com.goshoplane",
     version := "0.0.1",
     scalaVersion := Version.scala,
-    crossScalaVersions := Seq(Version.scala, "2.11.4"),
+    crossScalaVersions := Seq(Version.scala, "2.10.4"),
     scalacOptions := Seq("-unchecked", "-optimize", "-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions", "-language:postfixOps", "-language:reflectiveCalls", "-Yinline-warnings", "-encoding", "utf8"),
     retrieveManaged := true,
 
@@ -28,14 +28,13 @@ object CommonsBuild extends Build with Libraries {
     javaOptions += "-Xmx2500M",
 
     resolvers ++= Seq(
-      // "ReaderDeck Releases"    at "http://repo.readerdeck.com/artifactory/readerdeck-releases",
       "anormcypher"            at "http://repo.anormcypher.org/",
       "Akka Repository"        at "http://repo.akka.io/releases",
       "Spray Repository"       at "http://repo.spray.io/",
       "twitter-repo"           at "http://maven.twttr.com",
       "Typesafe Repository"    at "http://repo.typesafe.com/typesafe/releases/",
-      "Websudos releases"      at "http://maven.websudos.co.uk/ext-release-local",
-      "Websudos snapshots"     at "http://maven.websudos.co.uk/ext-snapshot-local",
+      // "Websudos releases"      at "http://maven.websudos.co.uk/ext-release-local",
+      // "Websudos snapshots"     at "http://maven.websudos.co.uk/ext-snapshot-local",
       "Sonatype repo"          at "https://oss.sonatype.org/content/groups/scala-tools/",
       "Sonatype releases"      at "https://oss.sonatype.org/content/repositories/releases",
       "Sonatype snapshots"     at "https://oss.sonatype.org/content/repositories/snapshots",
@@ -55,7 +54,7 @@ object CommonsBuild extends Build with Libraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, catalogue)
+  ) aggregate (core, catalogue, microservice)
 
 
 
@@ -93,5 +92,20 @@ object CommonsBuild extends Build with Libraries {
       ++ Libs.kafka
       ++ Libs.playJson
   ).dependsOn(core)
+
+
+  lazy val microservice = Project(
+    id = "commons-microservice",
+    base = file("microservice"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-microservice",
+
+    libraryDependencies ++= Seq(
+    ) ++ Libs.akka
+      ++ Libs.akkaCluster
+      ++ Libs.curator
+  )
 
 }

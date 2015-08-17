@@ -10,7 +10,7 @@ trait Libraries {
   object Version {
     val scala           = "2.10.4"
     val lucene          = "4.8.0"
-    val akka            = "2.3.6"
+    val akka            = "2.3.12"
     val scalaz          = "7.1.1"
     val graphstream     = "1.2"
     val fastutil        = "6.5.15"
@@ -47,12 +47,17 @@ trait Libraries {
     val phantom         = "1.5.0"
     val play            = "2.3.8"
     val kafka           = "0.8.2.0"
+    val curator         = "2.8.0"
     val researchpaperParser = "1.0"
   }
 
 
-
   object Libs {
+
+    val curator = Seq(
+      "org.apache.curator" % "curator-framework" % Version.curator exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12"),
+      "org.apache.curator" % "curator-recipes" % Version.curator  exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12"))
+
 
     val kafka = Seq (
       "org.apache.kafka" % "kafka-clients" % Version.kafka,
