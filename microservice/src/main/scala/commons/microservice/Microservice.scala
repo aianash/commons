@@ -2,15 +2,17 @@ package commons.microservice
 
 import collection.JavaConversions._
 import scala.concurrent.Future
-import scala.collection.immutable
+import scala.collection.immutable.{Seq => ImmutableSeq}
 import scala.util.control.Exception._
 
 import akka.actor._
 import akka.cluster.Cluster
+import akka.event.Logging
 
 import org.apache.zookeeper.CreateMode
 
 import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.framework.recipes.leader.LeaderLatch
 import org.apache.curator.retry.ExponentialBackoffRetry
 import org.apache.curator.utils.EnsurePath
 
@@ -21,22 +23,23 @@ import com.typesafe.config.Config
   * seed nodes from zookeeper
   *
   * IMP: Do not provide seed nodes in the Akka Cluster config
-  * because that will automatically join the node to cluster
-  * and then Microservice join will be ignored
+  * because that will automatically be used by AkkaCluster
+  * and hence Microservice join request will be ignored
   *
   * Usage:
   * {{{
   * case object UserComponent extends Component {
-  *   val identifiedBy = "user"
+  *   val name = "user"
+  *   val runOnRole = "user"
   *   def start(system: ActorSystem) {
-  *     system.actorOf(UserSupervisor.props, "user")
+  *     system.actorOf(UserSupervisor.props, name)
   *   }
   * }
   *
   * val system = ActorSystem("name", config)
   * Microservice(system).start(IndexedSeq(UserComponent))
   *
-  * // do other things with system
+  * // do other things with system, if you want to
   * }}}
   */
 object Microservice extends ExtensionId[Microservice] with ExtensionIdProvider {
@@ -57,8 +60,12 @@ object Microservice extends ExtensionId[Microservice] with ExtensionIdProvider {
   * @return Return value - blah blah
   */
 class Microservice(system: ExtendedActorSystem) extends Extension {
+  import InfoLogger._
 
   val settings = new MicroserviceSettings(system)
+  import settings.LogInfo
+
+  private val log = Logging(system, getClass.getName)
 
   val zkSeedPath = settings.ClusterSeedZkPath
 
@@ -81,28 +88,34 @@ class Microservice(system: ExtendedActorSystem) extends Extension {
       .build()
   }
 
+  curator.start()
+
   val zkMyId = address.hostPort
 
-  curator.start()
+  // Leader latch is used because at the very start if there are
+  // two nodes then both should decide which one to make the first
+  // seed nodes
+  // Hence leadership based selection is better
+  val leaderLatch = new LeaderLatch(curator, zkSeedPath, zkMyId)
 
   system.registerOnTermination {
     ignoring(classOf[IllegalStateException]) {
+      logInfo("Closing latch and zookeeper connection")
+      leaderLatch.close()
       curator.close()
     }
   }
 
-  /** Start the component and join this
-    * node to the cluster
+  /** Start all the applicable components and
+    * join this node with other cluster using
+    * seeds from zookeeper
     *
     * @param components   Components to start
     */
   def start(components: IndexedSeq[Component]) {
-    components.foreach { component =>
-      if(cluster.selfRoles.contains(component.identifiedBy)) {
-        component.start(system)
-      }
-    }
+    components.foreach { _.ifCanRunOn(cluster) { _.start(system) } }
     join()
+    logInfo("started components [{}]", components.map(_.name).reduceLeft(_ + ", " + _))
   }
 
   /**
@@ -111,16 +124,52 @@ class Microservice(system: ExtendedActorSystem) extends Extension {
    * NOTE: Should be called only once
    */
   private def join() {
+    logInfo("Joining cluster using seed nodes from zookeeper")
+
     new EnsurePath(zkSeedPath).ensure(curator.getZookeeperClient())
-    val s = curator.create().withMode(CreateMode.EPHEMERAL).forPath(zkSeedPath + "/" + zkMyId)
-    val nodes = curator.getChildren().forPath(zkSeedPath).filterNot(_.equals(zkMyId))
-    if(nodes.isEmpty) {
-      println("hjhjhjhj")
-      cluster.join(address)
-    } else {
-      val seeds = nodes.map(n => AddressFromURIString(s"akka.tcp://$n"))
-      cluster.joinSeedNodes(immutable.Seq(seeds: _*))
+    leaderLatch.start()
+
+    var joined = false;
+    var attempt = settings.RetryAttemptForLeaderElection
+
+    // Loop until joined or attepts exhausted
+    while((!joined) && (attempt > 0)) {
+      val possibleLeader = leaderLatch.getLeader
+      if(possibleLeader.isLeader) {
+        if(possibleLeader.getId == zkMyId) {
+          cluster.join(address)
+          joined = true
+        } else {
+          val seeds =
+            leaderLatch.getParticipants
+                       .filterNot(_.getId == zkMyId)
+                       .map { n => AddressFromURIString(s"akka.tcp://${n.getId}") }
+                       .toSeq
+          cluster.joinSeedNodes(ImmutableSeq(seeds: _*))
+          joined = true
+        }
+      }
+      attempt -= 1
+      if(!joined) log.warning(s"Failed to join node [{}], trying again, $attempt left", cluster.selfAddress)
+    }
+
+    if(!joined) {
+      log.error("Microservice couldnot join this Node [{}] to cluster, Hence stopping the ActorSystem", cluster.selfAddress)
+      system.shutdown()
     }
   }
 
+  private[microservice] object InfoLogger {
+
+    def logInfo(message: String): Unit =
+      if (LogInfo) log.info("Microservice Node [{}] - {}", cluster.selfAddress, message)
+
+    def logInfo(template: String, arg1: Any): Unit =
+      if (LogInfo) log.info("Microservice Node [{}] - " + template, cluster.selfAddress, arg1)
+
+    def logInfo(template: String, arg1: Any, arg2: Any): Unit =
+      if (LogInfo) log.info("Microservice Node [{}] - " + template, cluster.selfAddress, arg1, arg2)
+  }
+
 }
+

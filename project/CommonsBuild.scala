@@ -15,6 +15,7 @@ import sbtassembly.AssemblyPlugin.autoImport._
 import com.twitter.scrooge.ScroogeSBT
 
 object CommonsBuild extends Build with Libraries {
+  // System.setProperty("akka.mode", "test")
 
   def sharedSettings = Seq(
     organization := "com.goshoplane",

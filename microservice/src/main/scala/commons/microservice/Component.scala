@@ -1,6 +1,7 @@
 package commons.microservice
 
 import akka.actor.ActorSystem
+import akka.cluster.Cluster
 
 
 /** A component in micro service architecture
@@ -8,7 +9,16 @@ import akka.actor.ActorSystem
   */
 trait Component {
 
+  def name: String
   def start(system: ActorSystem)
-  def identifiedBy: String
+  def runOnRole: String
+
+  final def ifCanRunOn[T](cluster: Cluster)(thunk: Component => T): Unit =
+    if(canRunOn(cluster)) thunk(this)
+
+  /** Override this for custom logic
+    */
+  def canRunOn(cluster: Cluster): Boolean =
+    cluster.selfRoles.contains(runOnRole)
 
 }
