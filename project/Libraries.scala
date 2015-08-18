@@ -48,11 +48,24 @@ trait Libraries {
     val play            = "2.3.8"
     val kafka           = "0.8.2.0"
     val curator         = "2.8.0"
+    val scalatest       = "2.2.4"
     val researchpaperParser = "1.0"
   }
 
 
   object Libs {
+
+    val akkaMultiNodeTestkit = Seq(
+      "com.typesafe.akka" %% "akka-multi-node-testkit" % Version.akka)
+
+
+    val scalatest = Seq(
+      "org.scalatest" %% "scalatest" % Version.scalatest % "test")
+
+
+    val curatorTest = Seq(
+      "org.apache.curator" % "curator-test" % Version.curator % "test")
+
 
     val curator = Seq(
       "org.apache.curator" % "curator-framework" % Version.curator exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12"),
