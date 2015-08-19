@@ -14,8 +14,10 @@ import sbtassembly.AssemblyPlugin.autoImport._
 
 import com.twitter.scrooge.ScroogeSBT
 
-object CommonsBuild extends Build with Libraries {
-  // System.setProperty("akka.mode", "test")
+import com.goshoplane.sbt.standard.libraries.StandardLibraries
+
+
+object CommonsBuild extends Build with CommonsLibraries with StandardLibraries {
 
   def sharedSettings = Seq(
     organization := "com.goshoplane",
@@ -28,20 +30,7 @@ object CommonsBuild extends Build with Libraries {
     fork := true,
     javaOptions += "-Xmx2500M",
 
-    resolvers ++= Seq(
-      "anormcypher"            at "http://repo.anormcypher.org/",
-      "Akka Repository"        at "http://repo.akka.io/releases",
-      "Spray Repository"       at "http://repo.spray.io/",
-      "twitter-repo"           at "http://maven.twttr.com",
-      "Typesafe Repository"    at "http://repo.typesafe.com/typesafe/releases/",
-      // "Websudos releases"      at "http://maven.websudos.co.uk/ext-release-local",
-      // "Websudos snapshots"     at "http://maven.websudos.co.uk/ext-snapshot-local",
-      "Sonatype repo"          at "https://oss.sonatype.org/content/groups/scala-tools/",
-      "Sonatype releases"      at "https://oss.sonatype.org/content/repositories/releases",
-      "Sonatype snapshots"     at "https://oss.sonatype.org/content/repositories/snapshots",
-      "Sonatype staging"       at "http://oss.sonatype.org/content/repositories/staging",
-      "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository"
-    ),
+    resolvers ++= StandardResolvers,
 
     publishMavenStyle := true
   ) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
@@ -70,12 +59,12 @@ object CommonsBuild extends Build with Libraries {
 
     libraryDependencies ++= Seq(
     ) ++ Libs.scalaz
-      ++ Libs.scroogeCore
-      ++ Libs.finagleThrift
-      ++ Libs.libThrift
       ++ Libs.akka
       ++ Libs.phantom
       ++ Libs.fastutil
+      ++ CommonsLibs.libThrift
+      ++ CommonsLibs.finagleThrift
+      ++ CommonsLibs.scroogeCore
   )
 
 
@@ -85,13 +74,7 @@ object CommonsBuild extends Build with Libraries {
     settings = Project.defaultSettings ++
       sharedSettings
   ).settings(
-    name := "commons-catalogue",
-
-    libraryDependencies ++= Seq(
-    ) ++ Libs.msgpack
-      ++ Libs.scalaz
-      ++ Libs.kafka
-      ++ Libs.playJson
+    name := "commons-catalogue"
   ).dependsOn(core)
 
 
