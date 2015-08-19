@@ -17,7 +17,6 @@ import com.twitter.scrooge.ScroogeSBT
 import com.goshoplane.sbt.standard.libraries.StandardLibraries
 
 object CommonsBuild extends Build with StandardLibraries {
-  // System.setProperty("akka.mode", "test")
 
   def sharedSettings = Seq(
     organization := "com.goshoplane",
@@ -44,9 +43,7 @@ object CommonsBuild extends Build with StandardLibraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, microservice)
-
-
+  ) aggregate (core, microservice, catalogue)
 
   lazy val core = Project(
     id = "commons-core",
@@ -64,6 +61,14 @@ object CommonsBuild extends Build with StandardLibraries {
       ++ Libs.fastutil
   )
 
+  lazy val catalogue = Project(
+    id = "commons-catalogue",
+    base = file("catalogue"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-catalogue"
+  ).dependsOn(core)
 
   lazy val microservice = Project(
     id = "commons-microservice",
