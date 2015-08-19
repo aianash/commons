@@ -17,4 +17,7 @@ case class Price(value: Float) extends {
 
 object Price extends FixedSizeAttributeConstants {
   override private[catalogue] val HEAD_SIZE_BYTES = UnsafeUtil.FLOAT_SIZE_BYTES
+
+  def read(prepared: PreparedMemory) = Price(prepared.getFloat())
+
 }

@@ -20,18 +20,19 @@ trait CatalogueItem {
   import CatalogueItem._
 
   protected def _memory: Memory
-  protected def _itemType: ItemType.ItemType
+
+  def itemType: ItemType.ItemType
 
   protected[catalogue] val memory: Memory = _memory
 
   private[this] val _itemTypeGroups = new ArrayList[ItemTypeGroup.ItemTypeGroup]()
 
-  private val numSegments = memory.getShortAt(0)
+  private val numSegments = memory.getShortAt(CORE_ATTRIBUTES_SIZE_BYTES)
 
   /** IDs */
   val ownerId = {
     val ownerType = memory.getCharAt(OWNER_ID_CORE_OFFSET_BYTES)
-    val owuid = memory.getLongAt(OWNER_ID_CORE_OFFSET_BYTES + CHAR_SIZE_BYTES)
+    val owuid = memory.getLongAt(OWNER_ID_CORE_OFFSET_BYTES + OwnerType.SIZE_BYTES)
     OwnerId(OwnerType(ownerType), owuid)
   }
 
@@ -43,9 +44,9 @@ trait CatalogueItem {
 
   /** Types */
 
-  val itemType = _itemType
+  // val itemType = _itemType
 
-  require(itemType equals ItemType.withCode(memory.getIntAt(CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES)),
+  require(itemType equals ItemType.withCode(memory.getIntAt(ITEM_TYPE_CORE_OFFSET_BYTES)),
     new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
 
   def itemTypeGroups: ItemTypeGroups = ItemTypeGroups(_itemTypeGroups.toSeq)
@@ -58,7 +59,7 @@ trait CatalogueItem {
   }
 
   def productTitle: ProductTitle = {
-    val prepared = memory.prepareFor(classOf[ProductTitle], SEGMENT_IDX, NAMED_TYPE_ATTR_IDX, PRODUCT_TITLE_PRIMARY_HEAD_OFFSET)
+    val prepared = memory.prepareFor(classOf[ProductTitle], SEGMENT_IDX, PRODUCT_TITLE_ATTR_IDX, PRODUCT_TITLE_PRIMARY_HEAD_OFFSET)
     ProductTitle.read(prepared)
   }
 
@@ -124,10 +125,22 @@ object CatalogueItem extends CatalogueItemUtilMethods {
   ///////////////////////////////// CATALOGUE ITEM BUILDERS ///////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private[catalogue] class BuilderFatory[B <: Builder[B, BrandId], S <: Builder[S, StoreId]](
+    brandItemBuilderFactory: => B,
+    storeItemBuilderFactory: CatalogueItem => S
+  ) {
+
+    def forBrand = brandItemBuilderFactory
+
+    def forStore = new {
+      def using(item: CatalogueItem) = storeItemBuilderFactory(item)
+    }
+  }
+
   /** This trait defines reusable functions used by
     * item builders
     */
-  private[catalogue] trait CatalogueItemBuilder[B <: CatalogueItemBuilder[B]] { self: B =>
+  private[catalogue] trait Builder[B <: Builder[B, OW], OW <: OwnerId] { self: B =>
 
     type I <: CatalogueItem
 
@@ -136,7 +149,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     def numSegments: Int
     def itemType: ItemType.ItemType
 
-    private var _ownerId: OwnerId = null
+    private var _ownerId: OW = _
     private var _itemId: CatalogueItemId = CatalogueItemId.NULL
     private var _variantId: VariantId = VariantId.NULL
     private var _title: ProductTitle = null
@@ -162,32 +175,33 @@ object CatalogueItem extends CatalogueItemUtilMethods {
       this
     }
 
-    def ids(ownerId: OwnerId, itemId: CatalogueItemId, variantId: VariantId): B = {
+    def ids(ownerId: OW, itemId: CatalogueItemId, variantId: VariantId): B = {
       _ownerId = ownerId
       _itemId = itemId
       _variantId = variantId
       this
     }
 
-
     def setAttributes() {
       writeCoreAttributesTo(builder, _ownerId, _itemId, _variantId, itemType)
       writeTo(builder, _namedType, _title)
     }
 
-    def create: I
+    def build: I
 
     /** Description of function
       *
       * @param Parameter1 - blah blah
       * @return Return value - blah blah
       */
-    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OwnerId, itemId: CatalogueItemId, variantId: VariantId, itemType: ItemType.ItemType) {
+    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OW, itemId: CatalogueItemId, variantId: VariantId, itemType: ItemType.ItemType) {
+      builder.beginHeader()
       builder.putCharAt(OWNER_ID_CORE_OFFSET_BYTES, ownerId.ownerType.code)
-      builder.putLongAt(OWNER_ID_CORE_OFFSET_BYTES + CHAR_SIZE_BYTES, ownerId.owuid)
+      builder.putLongAt(OWNER_ID_CORE_OFFSET_BYTES + OwnerType.SIZE_BYTES, ownerId.owuid)
       builder.putLongAt(CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES, itemId.cuid)
       builder.putLongAt(VARIANT_ID_CORE_OFFSET_BYTES, variantId.vrtuid)
       builder.putIntAt(ITEM_TYPE_CORE_OFFSET_BYTES, itemType.code)
+      builder.endHeader()
     }
 
     /** Description of function
@@ -196,7 +210,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
       * @return Return value - blah blah
       */
     private def writeTo(builder: MemoryBuilder, namedType: NamedType, productTitle: ProductTitle) {
-      builder.begin(NUM_ATTRIBUTES, PRIMARY_HEAD_SIZE_BYTES)
+      builder.begin(CatalogueItem.NUM_ATTRIBUTES, CatalogueItem.PRIMARY_HEAD_SIZE_BYTES)
       builder.writeAttr(namedType, NAMED_TYPE_ATTR_IDX, NAMED_TYPE_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(productTitle, PRODUCT_TITLE_ATTR_IDX, PRODUCT_TITLE_PRIMARY_HEAD_OFFSET)
       builder.end()
@@ -209,9 +223,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  private[catalogue] abstract class BrandItemBuilder[B <: BrandItemBuilder[B]]
-    extends CatalogueItemBuilder[B] { self: B =>
-
+  private[catalogue] trait BrandItemBuilder[B <: Builder[B, BrandId]] { self: B =>
     protected val builder = new PrimaryMemoryBuilder(numSegments)
   }
 
@@ -220,8 +232,9 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  private[catalogue] abstract class StoreItemBuilder[B <: StoreItemBuilder[B]](brandItem: CatalogueItem)
-    extends CatalogueItemBuilder[B] { self: B =>
+  private[catalogue] trait StoreItemBuilder[B <: Builder[B, StoreId]] { self: B =>
+
+    def brandItem: CatalogueItem
 
     require(brandItem.itemType equals itemType,
       new IllegalArgumentException("Brand item is not of same itemType as " + itemType.name))

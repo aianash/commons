@@ -2,7 +2,7 @@ package commons.core.util
 
 object UnsafeUtil {
 
-  val unsafe: sun.misc.Unsafe = {
+  val UNSAFE: sun.misc.Unsafe = {
     var tmpUnsafe: sun.misc.Unsafe = null
 
     try {
@@ -11,29 +11,29 @@ object UnsafeUtil {
       tmpUnsafe = field.get(null).asInstanceOf[sun.misc.Unsafe]
     } catch {
       case ex: Exception =>
-        throw new RuntimeException("unable to get unsafe instance", ex)
+        throw new RuntimeException("unable to get UNSAFE instance", ex)
     }
 
     tmpUnsafe
   }
 
-  val BYTE_ARRAY_BASE_OFFSET: Long   = unsafe.arrayBaseOffset(classOf[Array[Byte]])
-  val FLOAT_ARRAY_BASE_OFFSET: Long  = unsafe.arrayBaseOffset(classOf[Array[Float]])
-  val DOUBLE_ARRAY_BASE_OFFSET: Long = unsafe.arrayBaseOffset(classOf[Array[Double]])
-  val INT_ARRAY_BASE_OFFSET: Long    = unsafe.arrayBaseOffset(classOf[Array[Int]])
-  val LONG_ARRAY_BASE_OFFSET: Long   = unsafe.arrayBaseOffset(classOf[Array[Long]])
-  val SHORT_ARRAY_BASE_OFFSET: Long  = unsafe.arrayBaseOffset(classOf[Array[Short]])
-  val CHAR_ARRAY_BASE_OFFSET: Long   = unsafe.arrayBaseOffset(classOf[Array[Char]])
+  val BYTE_ARRAY_BASE_OFFSET: Long   = UNSAFE.arrayBaseOffset(classOf[Array[Byte]])
+  val FLOAT_ARRAY_BASE_OFFSET: Long  = UNSAFE.arrayBaseOffset(classOf[Array[Float]])
+  val DOUBLE_ARRAY_BASE_OFFSET: Long = UNSAFE.arrayBaseOffset(classOf[Array[Double]])
+  val INT_ARRAY_BASE_OFFSET: Long    = UNSAFE.arrayBaseOffset(classOf[Array[Int]])
+  val LONG_ARRAY_BASE_OFFSET: Long   = UNSAFE.arrayBaseOffset(classOf[Array[Long]])
+  val SHORT_ARRAY_BASE_OFFSET: Long  = UNSAFE.arrayBaseOffset(classOf[Array[Short]])
+  val CHAR_ARRAY_BASE_OFFSET: Long   = UNSAFE.arrayBaseOffset(classOf[Array[Char]])
 
-  val REFERENCE_SIZE_BYTES = unsafe.arrayIndexScale(classOf[Array[Object]])
-  val BOOLEAN_SIZE_BYTES   = unsafe.arrayIndexScale(classOf[Array[Boolean]])
-  val BYTE_SIZE_BYTES      = unsafe.arrayIndexScale(classOf[Array[Byte]])
-  val SHORT_SIZE_BYTES     = unsafe.arrayIndexScale(classOf[Array[Short]])
-  val CHAR_SIZE_BYTES      = unsafe.arrayIndexScale(classOf[Array[Char]])
-  val INT_SIZE_BYTES       = unsafe.arrayIndexScale(classOf[Array[Int]])
-  val LONG_SIZE_BYTES      = unsafe.arrayIndexScale(classOf[Array[Long]])
-  val FLOAT_SIZE_BYTES     = unsafe.arrayIndexScale(classOf[Array[Float]])
-  val DOUBLE_SIZE_BYTES    = unsafe.arrayIndexScale(classOf[Array[Double]])
+  val REFERENCE_SIZE_BYTES = UNSAFE.arrayIndexScale(classOf[Array[Object]])
+  val BOOLEAN_SIZE_BYTES   = UNSAFE.arrayIndexScale(classOf[Array[Boolean]])
+  val BYTE_SIZE_BYTES      = UNSAFE.arrayIndexScale(classOf[Array[Byte]])
+  val SHORT_SIZE_BYTES     = UNSAFE.arrayIndexScale(classOf[Array[Short]])
+  val CHAR_SIZE_BYTES      = UNSAFE.arrayIndexScale(classOf[Array[Char]])
+  val INT_SIZE_BYTES       = UNSAFE.arrayIndexScale(classOf[Array[Int]])
+  val LONG_SIZE_BYTES      = UNSAFE.arrayIndexScale(classOf[Array[Long]])
+  val FLOAT_SIZE_BYTES     = UNSAFE.arrayIndexScale(classOf[Array[Float]])
+  val DOUBLE_SIZE_BYTES    = UNSAFE.arrayIndexScale(classOf[Array[Double]])
 
   val REFERENCE_SIZE_EXP = Integer.numberOfTrailingZeros(REFERENCE_SIZE_BYTES)
   val BOOLEAN_SIZE_EXP   = Integer.numberOfTrailingZeros(BOOLEAN_SIZE_BYTES)

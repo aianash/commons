@@ -74,7 +74,10 @@ object CommonsBuild extends Build with CommonsLibraries with StandardLibraries {
     settings = Project.defaultSettings ++
       sharedSettings
   ).settings(
-    name := "commons-catalogue"
+    name := "commons-catalogue",
+
+    libraryDependencies ++= Seq(
+    ) ++ Libs.scalatest
   ).dependsOn(core)
 
 

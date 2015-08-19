@@ -12,4 +12,10 @@ case class Brand(name: String) extends VariableSizeAttribute {
 
 }
 
-object Brand extends VariableSizeAttributeConstants
+object Brand extends VariableSizeAttributeConstants {
+
+  def read(prepared: PreparedMemory) = {
+    Brand(prepared.getString())
+  }
+
+}

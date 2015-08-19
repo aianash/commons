@@ -1,6 +1,6 @@
 package commons.catalogue.items
 
-import commons.catalogue.CatalogueItem
+import commons.catalogue.{CatalogueItem, OwnerId}
 import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.MemoryBuilder
 
@@ -12,10 +12,36 @@ import commons.catalogue.memory.builder.MemoryBuilder
   */
 trait Clothing extends CatalogueItem {
 
+  import Clothing._
+
   __appendItemTypeGroup(ItemTypeGroup.Clothing)
 
-  def brand: Brand = null
-  def price: Price = null
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def brand: Brand = {
+    val prepared = memory.prepareFor(classOf[Brand], SEGMENT_IDX, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET)
+    Brand.read(prepared)
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def price: Price = {
+    val prepared = memory.prepareFor(classOf[Price], SEGMENT_IDX, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET)
+    Price.read(prepared)
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def sizes: ClothingSizes = null
   def colors: Colors = null
 
@@ -56,7 +82,7 @@ object Clothing {
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////// CLOTHING BUILDERS ///////////////////////////////////////
+  ///////////////////////////////// CLOTHING BUILDER ////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////
 
   /** Description of function
@@ -64,8 +90,7 @@ object Clothing {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  private[catalogue] trait ClothingBuilder[B <: ClothingBuilder[B]]
-    extends CatalogueItem.CatalogueItemBuilder[B] { self: B =>
+  private[catalogue] trait Builder[B <: Builder[B, OW], OW <: OwnerId] extends CatalogueItem.Builder[B, OW] { self: B =>
 
     private var _brand: Brand = _
     private var _price: Price = _
@@ -95,16 +120,5 @@ object Clothing {
     }
 
   }
-
-  /** Description of function
-    *
-    * @param Parameter1 - blah blah
-    * @return Return value - blah blah
-    */
-  private[catalogue] abstract class BrandItemBuilder[B <: BrandItemBuilder[B]]
-    extends CatalogueItem.BrandItemBuilder[B] with ClothingBuilder[B] { self: B => }
-
-  private[catalogue] abstract class StoreItemBuilder[B <: StoreItemBuilder[B]]
-    extends CatalogueItem.BrandItemBuilder[B] with ClothingBuilder[B] { self: B => }
 
 }

@@ -38,7 +38,7 @@ trait CatalogueItemUtilMethods {
     * @return Return value - blah blah
     */
   def itemTypeOf(binary: Array[Byte]) =
-    ItemType.withCode(unsafe.getInt(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES))
+    ItemType.withCode(UNSAFE.getInt(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES))
 
   /** Description of function
     *
@@ -46,7 +46,7 @@ trait CatalogueItemUtilMethods {
     * @return Return value - blah blah
     */
   def ownerTypeOf(binary: Array[Byte]) =
-    OwnerType(unsafe.getChar(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.OWNER_ID_CORE_OFFSET_BYTES))
+    OwnerType(UNSAFE.getChar(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.OWNER_ID_CORE_OFFSET_BYTES))
 
   /** Description of function
     *
