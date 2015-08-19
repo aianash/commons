@@ -39,7 +39,7 @@ case class StoreId(stuid: Long) extends OwnerId {
 }
 
 object OwnerId {
-  val SIZE_BYTES = OwnerType.SIZE_BYTES + UnsafeUtil.INT_SIZE_BYTES
+  val SIZE_BYTES = OwnerType.SIZE_BYTES + UnsafeUtil.LONG_SIZE_BYTES
 
   def apply(ownerType: OwnerType, owuid: Long) = {
     ownerType match {

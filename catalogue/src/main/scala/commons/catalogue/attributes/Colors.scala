@@ -16,7 +16,7 @@ case class Colors(values: Seq[Color.Color]) extends {
 } with VariableSizeAttribute {
 
   override private[catalogue] def write(builder: MemoryBuilder) {
-
+    // ???
   }
 
 }

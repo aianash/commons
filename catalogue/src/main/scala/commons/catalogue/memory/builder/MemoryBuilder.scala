@@ -4,7 +4,7 @@ import java.util.ArrayList
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
-import commons.core.util.UnsafeUtil
+import commons.core.util.{UnsafeUtil, FastStringUtils}
 import commons.catalogue.CatalogueItem
 import commons.catalogue.attributes.{Attribute, FixedSizeAttribute, VariableSizeAttribute}
 import commons.catalogue.memory.Memory
@@ -18,28 +18,30 @@ import commons.catalogue.memory.Memory
 private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
 
   import UnsafeUtil._
+  import FastStringUtils._
   import MemoryBuilder._
   import Memory._
 
-  private val headerSize = CatalogueItem.CORE_ATTRIBUTES_SIZE_BYTES +   // core attributes
-                           (SHORT_SIZE_BYTES +                          // number of segments
+  private val headerSize = (CatalogueItem.CORE_ATTRIBUTES_SIZE_BYTES +   // core attributes
+                           SHORT_SIZE_BYTES +                          // number of segments
                            (numSegments << POSITION_SIZE_EXP) +         // pointers (offset) for each segments
                            7) & ~7                                      // padded to multiple of words (8 bytes)
 
   // Header contains
+  // - core attributes as defined by catalogue items (all are fized size)
   // - number of segments (Short)
   // - offset of each segment in the underlying array
-  // - core attributes as defined by catalogue items (all are fized size)
+  //
+  // size of Header is always in multiple of words (i.e. 8 bytes)
   //
   // Header resides at the beginning of underlying array
   // before any segment starts
   private[this] val header = Array.ofDim[Byte](headerSize)
 
-  // put number of segments in header
-  // short is enough to store number of segments
-  // because, there wont be more than ~65K segments
-  // ever
-  putShortAt(0, numSegments.toShort)
+  // Put number (as Short) of segments in header
+  // Short is enough to store segments count (ie. number of segments)
+  // because, there wont ever be more than ~65K segments
+  UNSAFE.putShort(header, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.CORE_ATTRIBUTES_SIZE_BYTES, numSegments.toShort)
 
   // Array of segments (Array[Byte]).
   // Any segment once added to this, should be assumed final
@@ -75,6 +77,23 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
   /////////////////////////////// MEMORY SEGMENT METHODS /////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def beginHeader() {
+    segment = header
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def endHeader() {
+    segment = null
+  }
 
   /** Creates a new segment to write attributes
     *
@@ -108,7 +127,7 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
                           SHORT_SIZE_BYTES +
                           (segmentIdx << POSITION_SIZE_EXP)
 
-    unsafe.putInt(header, offsetInSgmtTbl, udrlygNxtSgmtOff)
+    UNSAFE.putInt(header, offsetInSgmtTbl, udrlygNxtSgmtOff)
 
     val segmentSize = (pos - 1 + 7) & ~7 // pos - 1 since pos points
                                          // to the empty byte.
@@ -132,7 +151,7 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
     * @param headSizeInBytes  head size in bytes (note: this could be either secondary memory head size or primary memory head size
     */
   protected def mkBasicSegment(headSizeInBytes: Int) {
-    segmentIdx += -1
+    segmentIdx += 1
     pos = (headSizeInBytes + 7) & ~8
     segment = Array.ofDim[Byte](pos + 8) // atleast one more word than pos
                                          // and pos points to the start of it
@@ -148,18 +167,42 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
     * To be used only for writing in head section of segment.
     */
 
-  def putShortAt(pos: Int, value: Short): Unit = ???
-  def putIntAt(pos: Int, value: Int): Unit = ???
-  def putCharAt(pos: Int, value: Char): Unit = ???
-  def putLongAt(pos: Int, value: Long): Unit = ???
-  def putFloatAt(pos: Int, value: Float): Unit = ???
+  def putShortAt(pos: Int, value: Short): Unit =
+    UNSAFE.putShort(segment, BYTE_ARRAY_BASE_OFFSET + pos, value)
+
+  def putIntAt(pos: Int, value: Int): Unit =
+    UNSAFE.putInt(segment, BYTE_ARRAY_BASE_OFFSET + pos, value)
+
+  def putCharAt(pos: Int, value: Char): Unit =
+    UNSAFE.putChar(segment, BYTE_ARRAY_BASE_OFFSET + pos, value)
+
+  def putLongAt(pos: Int, value: Long): Unit =
+    UNSAFE.putLong(segment, BYTE_ARRAY_BASE_OFFSET + pos, value)
+
+  def putFloatAt(pos: Int, value: Float): Unit =
+    UNSAFE.putFloat(segment, BYTE_ARRAY_BASE_OFFSET + pos, value)
+
+  def putStringAt(pos: Int, value: String) =
+    FAST_STRING_IMPLEMENTATION.putString(value, segment, pos)
+
 
   /** Relative Put i.e. put at current pos and move it automatically
     * These methods ensure capacity before writing.
     */
 
-  def putInt(value: Int) {}
-  def putString(str: String) {}
+  def putInt(value: Int): Unit = {
+    if(pos + INT_SIZE_BYTES > segment.size) resize(INT_SIZE_BYTES)
+    putIntAt(pos, value)
+    pos += INT_SIZE_BYTES
+  }
+
+  def putString(str: String) = {
+    val atleast = FAST_STRING_IMPLEMENTATION.numBytesRequiredToEncode(str)
+    if(pos + atleast > segment.size) resize(atleast)
+    putStringAt(pos, str)
+    pos += atleast
+    atleast
+  }
 
   def putFixedSizeElementArray(arr: Array[_], size: Int) {}
 
@@ -198,10 +241,10 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
     */
   protected def mkUnderlying() = {
     val underlying = Array.ofDim[Byte](udrlygNxtSgmtOff)
-    unsafe.copyMemory(header, BYTE_ARRAY_BASE_OFFSET, underlying, BYTE_ARRAY_BASE_OFFSET, header.size)
+    UNSAFE.copyMemory(header, BYTE_ARRAY_BASE_OFFSET, underlying, BYTE_ARRAY_BASE_OFFSET, header.size)
     var segmentOff = header.size
     for(i <- 0 until segments.size) {
-      unsafe.copyMemory(segments(i), BYTE_ARRAY_BASE_OFFSET, underlying, BYTE_ARRAY_BASE_OFFSET + segmentOff, segmentSizes(i))
+      UNSAFE.copyMemory(segments(i), BYTE_ARRAY_BASE_OFFSET, underlying, BYTE_ARRAY_BASE_OFFSET + segmentOff, segmentSizes(i))
       segmentOff += segmentSizes(i)
     }
     underlying
@@ -215,7 +258,7 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
   protected def resize(atleast: Int = BLOCK_SIZE_BYTES) {
     val incr = (atleast + BLOCK_SIZE_BYTES_MINUS_ONE) & ~BLOCK_SIZE_BYTES_MINUS_ONE
     val newSegment = Array.ofDim[Byte](segment.length + incr)
-    unsafe.copyMemory(segment, BYTE_ARRAY_BASE_OFFSET, newSegment, BYTE_ARRAY_BASE_OFFSET, segment.length)
+    UNSAFE.copyMemory(segment, BYTE_ARRAY_BASE_OFFSET, newSegment, BYTE_ARRAY_BASE_OFFSET, segment.length)
     segment = newSegment
   }
 

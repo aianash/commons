@@ -44,7 +44,7 @@ private[catalogue] class SecondaryMemoryBuilder(primary: PrimaryMemory, numSegme
 
     if(attribute == null) {
       val primarySegmtOffset = primary.segmentOffset(segmentIdx)
-      val attrOffset = primary.getIntAt(primarySegmtOffset + primaryOffset)
+      val attrOffset = primary.getPositionAt(primarySegmtOffset + primaryOffset)
       putIntAt(attrHeadOffset, attrOffset)
     } else {
       pos = (pos + 7) & ~7

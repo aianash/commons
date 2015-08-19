@@ -1,6 +1,7 @@
 package commons.catalogue.items
 
 import commons.catalogue.attributes._
+import commons.catalogue.OwnerId
 
 
 trait MensClothing extends Clothing {
@@ -21,12 +22,9 @@ object MensClothing {
 
 
   /////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////// MensClothing Builders /////////////////////////////////
+  ///////////////////////////////// MENSCLOTHING BUILDER //////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  private[catalogue] trait Writers {}
-
-  private[catalogue] abstract class BrandItemBuilder[B <: BrandItemBuilder[B]]
-    extends Clothing.BrandItemBuilder[B] with Writers { self: B => }
+  private[catalogue] trait Builder[B <: Builder[B, OW], OW <: OwnerId] extends Clothing.Builder[B, OW] { self: B => }
 
 }

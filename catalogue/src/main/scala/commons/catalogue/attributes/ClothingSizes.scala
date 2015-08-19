@@ -19,7 +19,7 @@ case class ClothingSizes(values: Seq[ClothingSize.ClothingSize]) extends {
 } with VariableSizeAttribute {
 
   override private[catalogue] def write(builder: MemoryBuilder) {
-
+    // ???
   }
 
 }

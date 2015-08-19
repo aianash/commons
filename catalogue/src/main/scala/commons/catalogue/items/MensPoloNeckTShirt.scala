@@ -12,7 +12,7 @@ import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
   */
 class MensPoloNeckTShirt(protected val _memory: Memory) extends MensTShirt {
 
-  protected val _itemType = ItemType.MensPoloNeckTShirt
+  override def itemType = ItemType.MensPoloNeckTShirt
   __appendItemTypeGroup(ItemTypeGroup.MensPoloNeckTShirt)
 
 }
@@ -44,27 +44,27 @@ object MensPoloNeckTShirt {
     }
   }
 
-  def newBrandItem = new BrandItemBuilder
+  def builder = new CatalogueItem.BuilderFatory(new BrandItemBuilder, c => new StoreItemBuilder(c))
 
-  // def createStoreItem = new StoreItemBuilder
+  private[catalogue] trait Builder[B <: Builder[B, OW], OW <: OwnerId] extends MensTShirt.Builder[B, OW] { self: B =>
+    type I = MensPoloNeckTShirt
+    val numSegments = TOTAL_SEGMENTS
+    val itemType = ItemType.MensPoloNeckTShirt
+
+    def build() = {
+      super.setAttributes()
+      new MensPoloNeckTShirt(builder.memory())
+    }
+  }
+
 
   /** Description of function
     *
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  class BrandItemBuilder extends MensTShirt.BrandItemBuilder[BrandItemBuilder] {
+  class BrandItemBuilder extends Builder[BrandItemBuilder, BrandId] with CatalogueItem.BrandItemBuilder[BrandItemBuilder]
 
-    type I = MensPoloNeckTShirt
-
-    val numSegments = TOTAL_SEGMENTS
-    val itemType = ItemType.MensPoloNeckTShirt
-
-    def create() = {
-      super.setAttributes()
-      new MensPoloNeckTShirt(builder.memory()) {}
-    }
-
-  }
+  class StoreItemBuilder(val brandItem: CatalogueItem) extends Builder[StoreItemBuilder, StoreId] with CatalogueItem.StoreItemBuilder[StoreItemBuilder]
 
 }

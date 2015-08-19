@@ -2,8 +2,9 @@ package commons.catalogue.memory
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 
-import commons.core.util.UnsafeUtil
+import commons.core.util.{UnsafeUtil, FastStringUtils}
 import commons.catalogue.attributes.{Attribute, FixedSizeAttribute, VariableSizeAttribute}
+import commons.catalogue.CatalogueItem
 
 
 /** Memory is used by catalogue item to encode and save its attributes
@@ -26,6 +27,7 @@ import commons.catalogue.attributes.{Attribute, FixedSizeAttribute, VariableSize
 private[catalogue] abstract class Memory(private[catalogue] val underlying: Array[Byte]) {
 
   import UnsafeUtil._
+  import FastStringUtils._
   import Memory._
   import builder.MemoryBuilder._
 
@@ -34,7 +36,10 @@ private[catalogue] abstract class Memory(private[catalogue] val underlying: Arra
     * @param idx  Segment index (i.e level in the hierarchy starting from 0)
     */
   private[catalogue] def segmentOffset(idx: Int) =
-    unsafe.getInt(underlying, BYTE_ARRAY_BASE_OFFSET + INT_SIZE_BYTES + (idx << POSITION_SIZE_EXP))
+    UNSAFE.getInt(underlying,
+      BYTE_ARRAY_BASE_OFFSET +
+      CatalogueItem.CORE_ATTRIBUTES_SIZE_BYTES +
+      SHORT_SIZE_BYTES + (idx << POSITION_SIZE_EXP))
 
   /** Description of function
     *
@@ -66,12 +71,48 @@ private[catalogue] abstract class Memory(private[catalogue] val underlying: Arra
   ////////////////////////////// GET METHODS ////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
-  def getIntAt(pos: Int): Int = ???
-  def getLongAt(pos: Int): Long = ???
-  def getCharAt(pos: Int): Char = ???
-  def getShortAt(pos: Int): Short = ???
-  def getStringAt(pos: Int): String = ???
-  def getPositionAt(pos: Int): Int = ???
+  def getIntAt(pos: Int): Int =
+    UNSAFE.getInt(underlying, BYTE_ARRAY_BASE_OFFSET + pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getLongAt(pos: Int): Long =
+    UNSAFE.getLong(underlying, BYTE_ARRAY_BASE_OFFSET + pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getCharAt(pos: Int): Char =
+    UNSAFE.getChar(underlying, BYTE_ARRAY_BASE_OFFSET + pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getShortAt(pos: Int): Short =
+    UNSAFE.getShort(underlying, BYTE_ARRAY_BASE_OFFSET + pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getStringAt(pos: Int): String =
+    FAST_STRING_IMPLEMENTATION.getString(underlying, pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getPositionAt(pos: Int): Int = getIntAt(pos)
+
 }
 
 
