@@ -113,6 +113,13 @@ private[catalogue] abstract class Memory(private[catalogue] val underlying: Arra
     */
   def getPositionAt(pos: Int): Int = getIntAt(pos)
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def binary: Array[Byte]
+
 }
 
 

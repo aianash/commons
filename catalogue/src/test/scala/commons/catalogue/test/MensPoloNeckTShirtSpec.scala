@@ -88,6 +88,15 @@ class MensPoloNeckTShirtSpec extends UnitSpec {
       assert(item.brand equals brand)
       assert(item.price equals price)
 
+      And("we can construct Clothing from it")
+      val clothing = new commons.catalogue.items.Clothing(item.memory)
+      assert(clothing.brand equals brand)
+      assert(clothing.price equals price)
+      assert(clothing.itemType equals ItemType.MensPoloNeckTShirt)
+      assert(clothing.itemTypeGroup equals ItemType.Clothing)
+      assert(clothing.itemType.toString equals "MensPoloNeckTShirt")
+      assert(ItemType("Clothing") equals ItemType.Clothing)
+
       info("Then it was able to correctly build MensPoloNeckTShirt Store Item using a Brand Item")
     }
   }

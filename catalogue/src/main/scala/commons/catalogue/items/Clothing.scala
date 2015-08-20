@@ -1,8 +1,9 @@
 package commons.catalogue.items
 
-import commons.catalogue.{CatalogueItem, OwnerId}
+import commons.catalogue.{CatalogueItem, OwnerId, ItemType}
 import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.MemoryBuilder
+import commons.catalogue.memory.Memory
 
 
 /** Description of function
@@ -10,12 +11,11 @@ import commons.catalogue.memory.builder.MemoryBuilder
   * @param Parameter1 - blah blah
   * @return Return value - blah blah
   */
-trait Clothing extends CatalogueItem {
+class Clothing(memory: Memory) extends CatalogueItem(memory) {
 
   import Clothing._
 
-  __appendItemTypeGroup(ItemTypeGroup.Clothing)
-
+  def itemTypeGroup = ItemType.Clothing
 
   /** Description of function
     *
@@ -42,8 +42,23 @@ trait Clothing extends CatalogueItem {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def sizes: ClothingSizes = null
-  def colors: Colors = null
+  def sizes: ClothingSizes = {
+    ???
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def colors: Colors = {
+    ???
+  }
+
+  override def canEqual(that: Any) = that match {
+    case Clothing => true
+    case _ => false
+  }
 
 }
 

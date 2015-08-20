@@ -48,7 +48,7 @@ private[catalogue] class SecondaryMemoryBuilder(primary: PrimaryMemory, numSegme
       putIntAt(attrHeadOffset, attrOffset)
     } else {
       pos = (pos + 7) & ~7
-      putIntAt(attrHeadOffset, udrlygNxtSgmtOff + pos)
+      putIntAt(attrHeadOffset, pos)
       attribute.write(this)
       setNotInheritedAt(attrIdx)
     }
@@ -74,15 +74,14 @@ private[catalogue] class SecondaryMemoryBuilder(primary: PrimaryMemory, numSegme
                          (attrIdx << POSITION_SIZE_EXP)
 
     if(attribute == null) {
-      val attrOffset = primary.segmentOffset(segmentIdx) + primaryOffset
-      putIntAt(attrHeadOffset, attrOffset)
+      putIntAt(attrHeadOffset, primaryOffset)
     } else {
       pos = (pos + 7) & ~7
       val attrSize = attribute.sizeInBytes
       if(pos + attrSize >= segment.length) resize(attrSize)
+      putIntAt(attrHeadOffset, pos)
       attribute.writeAt(this, pos)
       setNotInheritedAt(attrIdx)
-      putIntAt(attrHeadOffset, udrlygNxtSgmtOff + pos)
       pos += attrSize
     }
   }
