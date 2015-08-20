@@ -13,15 +13,17 @@ private[catalogue] class PrimaryMemory(_underlying: Array[Byte]) extends Memory(
   import Memory._
 
   def prepareForVariable(segmentIdx: Int, attrIdx: Int, primaryOffset: Int): PreparedMemory = {
-    val offset = segmentOffset(segmentIdx) + primaryOffset
-    val pos = getPositionAt(offset)
-    new PreparedMemory(underlying, pos, this)
+    val sgmtOffset = segmentOffset(segmentIdx)
+    val pos = getPositionAt(sgmtOffset + primaryOffset)
+    new PreparedMemory(underlying, sgmtOffset + pos, this)
   }
 
   def prepareForFixed(segmentIdx: Int, attrIdx: Int, primaryOffset: Int): PreparedMemory = {
     val pos = segmentOffset(segmentIdx) + primaryOffset
     new PreparedMemory(underlying, pos, this)
   }
+
+  def binary = underlying
 
 }
 
@@ -38,5 +40,6 @@ object PrimaryMemory {
     * @param binary  Encoded array of bytes
     * @return PrimaryMemory instance
     */
-  def create(binary: Array[Byte]) = new PrimaryMemory(binary)
+  def apply(binary: Array[Byte]) = new PrimaryMemory(binary)
+
 }

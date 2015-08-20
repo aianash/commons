@@ -10,13 +10,16 @@ import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
   * @param Parameter1 - blah blah
   * @return Return value - blah blah
   */
-class MensPoloNeckTShirt(protected val _memory: Memory) extends MensTShirt {
+class MensPoloNeckTShirt(memory: Memory) extends MensTShirt(memory) {
 
-  override def itemType = ItemType.MensPoloNeckTShirt
-  __appendItemTypeGroup(ItemTypeGroup.MensPoloNeckTShirt)
+  override def itemTypeGroup = ItemType.MensPoloNeckTShirt
+
+  override def canEqual(that: Any) = that match {
+    case MensPoloNeckTShirt => true
+    case _ => false
+  }
 
 }
-
 
 /**
  * This object is used to create brand and store items for
@@ -28,17 +31,17 @@ object MensPoloNeckTShirt {
   val SEGMENT_IDX = MensTShirt.SEGMENT_IDX + 1
   val TOTAL_SEGMENTS = SEGMENT_IDX + 1
 
-  private[catalogue] def create(binary: Array[Byte]) = {
+  private[catalogue] def apply(binary: Array[Byte]) = {
     CatalogueItem.ownerTypeOf(binary) match {
-      case BRAND => new MensPoloNeckTShirt(PrimaryMemory.create(binary))
+      case BRAND => new MensPoloNeckTShirt(PrimaryMemory(binary))
       case _ => throw new IllegalArgumentException("OwnerType of parameters not BRAND")
     }
   }
 
-  private[catalogue] def create(binary: Array[Byte], brandItem: CatalogueItem) = {
+  private[catalogue] def apply(binary: Array[Byte], brandItem: CatalogueItem) = {
     CatalogueItem.ownerTypeOf(binary) match {
       case STORE if brandItem.ownerId.ownerType.equals(BRAND) && brandItem.isInstanceOf[MensPoloNeckTShirt] =>
-        new MensPoloNeckTShirt(SecondaryMemory.create(binary, brandItem.memory))
+        new MensPoloNeckTShirt(SecondaryMemory(binary, brandItem.memory))
       case _ =>
         throw new IllegalArgumentException("OwnerType of parameters is not consistent ie binary with STORE and item with BRAND type")
     }

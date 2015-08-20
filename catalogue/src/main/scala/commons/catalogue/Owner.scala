@@ -13,13 +13,13 @@ case object BRAND extends OwnerType {
 }
 
 object OwnerType {
+
   val SIZE_BYTES = UnsafeUtil.CHAR_SIZE_BYTES
 
-  def apply(code: Char) =
-    code match {
-      case 'S' => STORE
-      case 'B' => BRAND
-    }
+  def apply(code: Char) = code match {
+    case 'S' => STORE
+    case 'B' => BRAND
+  }
 
 }
 

@@ -17,9 +17,10 @@ trait CatalogueItemUtilMethods {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def create(binary: Array[Byte]) =
+  def apply(binary: Array[Byte]) =
     itemTypeOf(binary) match {
-      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt.create(binary)
+      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary)
+      case _ => throw new IllegalArgumentException("This item type is not yet imeplemented")
     }
 
   /** Description of function
@@ -27,9 +28,10 @@ trait CatalogueItemUtilMethods {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def create(binary: Array[Byte], brandItem: CatalogueItem) =
+  def apply(binary: Array[Byte], brandItem: CatalogueItem) =
     brandItem.itemType match {
-      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt.create(binary, brandItem)
+      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary, brandItem)
+      case _ => throw new IllegalArgumentException("This item type is not yet imeplemented")
     }
 
   /** Description of function
@@ -38,7 +40,7 @@ trait CatalogueItemUtilMethods {
     * @return Return value - blah blah
     */
   def itemTypeOf(binary: Array[Byte]) =
-    ItemType.withCode(UNSAFE.getInt(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES))
+    ItemType(UNSAFE.getInt(binary, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES))
 
   /** Description of function
     *
@@ -46,7 +48,7 @@ trait CatalogueItemUtilMethods {
     * @return Return value - blah blah
     */
   def ownerTypeOf(binary: Array[Byte]) =
-    OwnerType(UNSAFE.getChar(BYTE_ARRAY_BASE_OFFSET + CatalogueItem.OWNER_ID_CORE_OFFSET_BYTES))
+    OwnerType(UNSAFE.getChar(binary, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.OWNER_ID_CORE_OFFSET_BYTES))
 
   /** Description of function
     *

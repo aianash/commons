@@ -31,7 +31,7 @@ private[catalogue] class PrimaryMemoryBuilder(numSegments: Int)
       // 2. calcualte offset as in underlying array and put in head section
       // 3. write the attribute at the current pos
       pos = (pos + 7) & ~7
-      putIntAt(primaryOffset, udrlygNxtSgmtOff + pos)
+      putIntAt(primaryOffset, pos)
       attribute.write(this)
     } else throw new IllegalArgumentException("Variable attribute cannot be null in PrimaryMemory")
   }

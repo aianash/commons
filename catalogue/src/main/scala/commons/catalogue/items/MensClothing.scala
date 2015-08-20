@@ -1,12 +1,19 @@
 package commons.catalogue.items
 
+import commons.catalogue.ItemType
 import commons.catalogue.attributes._
 import commons.catalogue.OwnerId
+import commons.catalogue.memory.Memory
 
 
-trait MensClothing extends Clothing {
+class MensClothing(memory: Memory) extends Clothing(memory) {
 
-  __appendItemTypeGroup(ItemTypeGroup.MensClothing)
+  override def itemTypeGroup = ItemType.MensClothing
+
+  override def canEqual(that: Any) = that match {
+    case MensClothing => true
+    case _ => false
+  }
 
 }
 

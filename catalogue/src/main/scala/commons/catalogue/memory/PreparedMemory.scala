@@ -61,4 +61,11 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, pare
   def getString(): String =
     FAST_STRING_IMPLEMENTATION.getString(_underlying, pos)
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def binary = parent.binary
+
 }

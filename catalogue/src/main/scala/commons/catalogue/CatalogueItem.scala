@@ -4,7 +4,7 @@ import scala.collection.JavaConversions._
 
 import java.util.ArrayList
 
-import commons.core.util.UnsafeUtil.CHAR_SIZE_BYTES
+import commons.core.util.UnsafeUtil
 import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.{MemoryBuilder, PrimaryMemoryBuilder, SecondaryMemoryBuilder}
 import commons.catalogue.memory.{Memory, PrimaryMemory}
@@ -15,17 +15,17 @@ import commons.catalogue.memory.{Memory, PrimaryMemory}
   * @param Parameter1 - blah blah
   * @return Return value - blah blah
   */
-trait CatalogueItem {
+abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equals {
 
+  import UnsafeUtil._
   import CatalogueItem._
 
-  protected def _memory: Memory
+  val itemType: ItemType = ItemType(memory.getIntAt(ITEM_TYPE_CORE_OFFSET_BYTES))
+  def itemTypeGroup: ItemType
 
-  def itemType: ItemType.ItemType
+  require(itemTypeGroup.getClass isAssignableFrom itemType.getClass,
+    new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
 
-  protected[catalogue] val memory: Memory = _memory
-
-  private[this] val _itemTypeGroups = new ArrayList[ItemTypeGroup.ItemTypeGroup]()
 
   private val numSegments = memory.getShortAt(CORE_ATTRIBUTES_SIZE_BYTES)
 
@@ -42,15 +42,6 @@ trait CatalogueItem {
 
   val variantId = VariantId(memory.getLongAt(VARIANT_ID_CORE_OFFSET_BYTES))
 
-  /** Types */
-
-  // val itemType = _itemType
-
-  require(itemType equals ItemType.withCode(memory.getIntAt(ITEM_TYPE_CORE_OFFSET_BYTES)),
-    new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
-
-  def itemTypeGroups: ItemTypeGroups = ItemTypeGroups(_itemTypeGroups.toSeq)
-
   /** Attributes */
 
   def namedType: NamedType = {
@@ -63,13 +54,21 @@ trait CatalogueItem {
     ProductTitle.read(prepared)
   }
 
-  /** Description of function
-    *
-    * @param Parameter1 - blah blah
-    * @return Return value - blah blah
-    */
-  protected def __appendItemTypeGroup(group: ItemTypeGroup.ItemTypeGroup) {
-    _itemTypeGroups.add(group)
+  def binary = memory.binary
+
+  override def equals(that: Any) = that match {
+    case that: CatalogueItem =>
+      (this eq that) ||
+      (that canEqual this) &&
+      (this.ownerId equals that.ownerId) &&
+      (this.itemId equals that.itemId)
+    case _ => false
+  }
+
+  override def hashCode() = {
+    val arr = Array.ofDim[Byte](OwnerId.SIZE_BYTES + CatalogueItemId.SIZE_BYTES)
+    UNSAFE.copyMemory(memory.underlying, BYTE_ARRAY_BASE_OFFSET, arr, BYTE_ARRAY_BASE_OFFSET, OwnerId.SIZE_BYTES + CatalogueItemId.SIZE_BYTES)
+    scala.util.hashing.MurmurHash3.bytesHash(arr)
   }
 
 }
@@ -147,7 +146,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     protected def builder: MemoryBuilder
 
     def numSegments: Int
-    def itemType: ItemType.ItemType
+    def itemType: ItemType
 
     private var _ownerId: OW = _
     private var _itemId: CatalogueItemId = CatalogueItemId.NULL
@@ -194,13 +193,13 @@ object CatalogueItem extends CatalogueItemUtilMethods {
       * @param Parameter1 - blah blah
       * @return Return value - blah blah
       */
-    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OW, itemId: CatalogueItemId, variantId: VariantId, itemType: ItemType.ItemType) {
+    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OW, itemId: CatalogueItemId, variantId: VariantId, itemType: ItemType) {
       builder.beginHeader()
       builder.putCharAt(OWNER_ID_CORE_OFFSET_BYTES, ownerId.ownerType.code)
       builder.putLongAt(OWNER_ID_CORE_OFFSET_BYTES + OwnerType.SIZE_BYTES, ownerId.owuid)
       builder.putLongAt(CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES, itemId.cuid)
       builder.putLongAt(VARIANT_ID_CORE_OFFSET_BYTES, variantId.vrtuid)
-      builder.putIntAt(ITEM_TYPE_CORE_OFFSET_BYTES, itemType.code)
+      builder.putIntAt(ITEM_TYPE_CORE_OFFSET_BYTES, itemType.id)
       builder.endHeader()
     }
 
@@ -237,7 +236,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     def brandItem: CatalogueItem
 
     require(brandItem.itemType equals itemType,
-      new IllegalArgumentException("Brand item is not of same itemType as " + itemType.name))
+      new IllegalArgumentException("Brand item is not of same itemType as " + itemType.toString))
 
     require(brandItem.ownerId.ownerType equals BRAND,
       new IllegalArgumentException("Catalogue items's ownerType is not BRAND"))
