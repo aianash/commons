@@ -10,6 +10,18 @@ import scala.util.matching.Regex
 trait ItemType {
   def id: Int
   def groups: Seq[ItemType]
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def >>(itemType: ItemType) =
+    this.getClass isAssignableFrom itemType.getClass
+
+  def <<(itemType: ItemType) =
+    itemType >> this
+
 }
 
 object ItemType {

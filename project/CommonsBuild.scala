@@ -77,7 +77,9 @@ object CommonsBuild extends Build with CommonsLibraries with StandardLibraries {
     name := "commons-catalogue",
 
     libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-testkit" % Version.akka
     ) ++ Libs.scalatest
+      ++ Libs.fastutil
   ).dependsOn(core)
 
 

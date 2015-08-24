@@ -1,9 +1,11 @@
-package commons.catalogue.items
+package commons
+package catalogue
+package items
 
-import commons.catalogue.{CatalogueItem, OwnerId, ItemType}
+import commons.catalogue._
 import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.MemoryBuilder
-import commons.catalogue.memory.Memory
+import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
 
 
 /** Description of function
@@ -55,8 +57,21 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     ???
   }
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def asClothing =
+    new Clothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemType.Clothing))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   override def canEqual(that: Any) = that match {
-    case Clothing => true
+    case _: Clothing => true
     case _ => false
   }
 
@@ -72,6 +87,28 @@ object Clothing {
 
   // Clothing inherits from Catalogue Item
   val SEGMENT_IDX = CatalogueItem.SEGMENT_IDX + 1
+
+  private[catalogue] def apply(binary: Array[Byte]) =
+    ifBrand(binary) { memory =>
+      new Clothing(memory)
+    }
+
+  // CatalogueItem.ownerTypeOf(binary) match {
+  //   case BRAND => new Clothing(PrimaryMemory(binary))
+  //   case _ => throw new IllegalArgumentException("OwnerType of parameters not BRAND")
+  // }
+
+  private[catalogue] def apply(binary: Array[Byte], brandItem: CatalogueItem) =
+    ifStore(binary, thenWithBrand = brandItem) { memory =>
+      new Clothing(memory)
+    }
+
+  // CatalogueItem.ownerTypeOf(binary) match {
+  //   case STORE if brandItem.memory.isPrimary && brandItem.isInstanceOf[Clothing] =>
+  //     new Clothing(SecondaryMemory(binary, brandItem.memory))
+  //   case _ =>
+  //     throw new IllegalArgumentException("OwnerType of parameters is not consistent ie binary with STORE and item with BRAND type")
+  // }
 
 
   ///////////////////////////////////////////////////////////////////////////////////////

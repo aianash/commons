@@ -12,18 +12,41 @@ private[catalogue] class PrimaryMemory(_underlying: Array[Byte]) extends Memory(
 
   import Memory._
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def isPrimary = true
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def prepareForVariable(segmentIdx: Int, attrIdx: Int, primaryOffset: Int): PreparedMemory = {
     val sgmtOffset = segmentOffset(segmentIdx)
     val pos = getPositionAt(sgmtOffset + primaryOffset)
     new PreparedMemory(underlying, sgmtOffset + pos, this)
   }
 
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def prepareForFixed(segmentIdx: Int, attrIdx: Int, primaryOffset: Int): PreparedMemory = {
     val pos = segmentOffset(segmentIdx) + primaryOffset
     new PreparedMemory(underlying, pos, this)
   }
 
-  def binary = underlying
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def truncateTo(segmentIdx: Int) =
+    new PrimaryMemory(newUnderlyingTruncatedTo(segmentIdx))
 
 }
 

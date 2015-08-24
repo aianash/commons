@@ -31,6 +31,8 @@ private[catalogue] abstract class Memory(private[catalogue] val underlying: Arra
   import Memory._
   import builder.MemoryBuilder._
 
+  def isPrimary: Boolean
+
   /** Get segment offset (i.e. starting pos) in the underlying byte array
     *
     * @param idx  Segment index (i.e level in the hierarchy starting from 0)
@@ -118,7 +120,30 @@ private[catalogue] abstract class Memory(private[catalogue] val underlying: Arra
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def binary: Array[Byte]
+  def truncateTo(segmentIdx: Int): Memory
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  protected def newUnderlyingTruncatedTo(segmentIdx: Int) = {
+    val numSegments = UNSAFE.getShort(underlying, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.CORE_ATTRIBUTES_SIZE_BYTES).toInt
+
+    var nxtSgmtIdx = segmentIdx + 1
+    var nxtSgmtOffset = 0
+
+    while(nxtSgmtOffset == 0 && nxtSgmtIdx < numSegments) {
+      nxtSgmtOffset = segmentOffset(nxtSgmtIdx)
+      nxtSgmtIdx += 1
+    }
+
+    val upto = if(nxtSgmtOffset == 0) underlying.size else nxtSgmtOffset - 1
+
+    val newUnderlying = Array.ofDim[Byte](upto)
+    UNSAFE.copyMemory(underlying, BYTE_ARRAY_BASE_OFFSET, newUnderlying, BYTE_ARRAY_BASE_OFFSET, upto)
+    newUnderlying
+  }
 
 }
 
@@ -134,4 +159,5 @@ object Memory {
 
   private val VARIABLE_ATTR_CLAZZ = classOf[VariableSizeAttribute]
   private val FIXED_ATTR_CLAZZ = classOf[FixedSizeAttribute]
+
 }
