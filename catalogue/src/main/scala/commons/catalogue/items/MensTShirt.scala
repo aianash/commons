@@ -8,14 +8,20 @@ import commons.catalogue.memory.Memory
 
 class MensTShirt(memory: Memory) extends MensClothing(memory) {
 
+  import MensTShirt._
+
   override def itemTypeGroup = ItemType.MensTShirt
 
   override def canEqual(that: Any) = that match {
-    case MensTShirt => true
+    case _: MensTShirt => true
     case _ => false
   }
 
+  def asMensTShirt =
+    new MensTShirt(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemType.MensTShirt))
+
 }
+
 
 object MensTShirt {
 

@@ -15,7 +15,7 @@ class MensPoloNeckTShirt(memory: Memory) extends MensTShirt(memory) {
   override def itemTypeGroup = ItemType.MensPoloNeckTShirt
 
   override def canEqual(that: Any) = that match {
-    case MensPoloNeckTShirt => true
+    case _: MensPoloNeckTShirt => true
     case _ => false
   }
 
@@ -31,12 +31,10 @@ object MensPoloNeckTShirt {
   val SEGMENT_IDX = MensTShirt.SEGMENT_IDX + 1
   val TOTAL_SEGMENTS = SEGMENT_IDX + 1
 
-  private[catalogue] def apply(binary: Array[Byte]) = {
-    CatalogueItem.ownerTypeOf(binary) match {
-      case BRAND => new MensPoloNeckTShirt(PrimaryMemory(binary))
-      case _ => throw new IllegalArgumentException("OwnerType of parameters not BRAND")
+  private[catalogue] def apply(binary: Array[Byte]) =
+    ifBrand(binary) { memory =>
+      new MensPoloNeckTShirt(memory)
     }
-  }
 
   private[catalogue] def apply(binary: Array[Byte], brandItem: CatalogueItem) = {
     CatalogueItem.ownerTypeOf(binary) match {

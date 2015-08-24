@@ -24,8 +24,18 @@ object OwnerType {
 }
 
 trait OwnerId {
+
   def ownerType: OwnerType
   def owuid: Long
+
+  override def equals(that: Any) = that match {
+    case that: OwnerId =>
+      (this eq that) ||
+      ((that.ownerType equals this.ownerType) &&
+      (that.owuid == this.owuid))
+    case _ => false
+  }
+
 }
 
 case class BrandId(bruid: Long) extends OwnerId {

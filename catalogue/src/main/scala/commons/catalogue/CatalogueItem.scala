@@ -23,9 +23,11 @@ abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equa
   val itemType: ItemType = ItemType(memory.getIntAt(ITEM_TYPE_CORE_OFFSET_BYTES))
   def itemTypeGroup: ItemType
 
-  require(itemTypeGroup.getClass isAssignableFrom itemType.getClass,
+  require(itemTypeGroup equals ItemType(memory.getIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES)),
     new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
 
+  require(itemTypeGroup >> itemType, //.getClass isAssignableFrom itemType.getClass,
+    new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
 
   private val numSegments = memory.getShortAt(CORE_ATTRIBUTES_SIZE_BYTES)
 
@@ -54,14 +56,17 @@ abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equa
     ProductTitle.read(prepared)
   }
 
-  def binary = memory.binary
+  protected def afterItemTypeGroupIsSetTo(memory: Memory, itemTypeGroup: ItemType) = {
+    UNSAFE.putInt(memory.underlying, BYTE_ARRAY_BASE_OFFSET + ITEM_TYPE_GROUP_CORE_OFFSET_BYTES, itemTypeGroup.id)
+    memory
+  }
 
   override def equals(that: Any) = that match {
     case that: CatalogueItem =>
       (this eq that) ||
-      (that canEqual this) &&
+      ((this canEqual that) &&
       (this.ownerId equals that.ownerId) &&
-      (this.itemId equals that.itemId)
+      (this.itemId equals that.itemId))
     case _ => false
   }
 
@@ -96,8 +101,9 @@ object CatalogueItem extends CatalogueItemUtilMethods {
   private[catalogue] val CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES = OWNER_ID_CORE_OFFSET_BYTES + OwnerId.SIZE_BYTES
   private[catalogue] val VARIANT_ID_CORE_OFFSET_BYTES        = CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES + CatalogueItemId.SIZE_BYTES
   private[catalogue] val ITEM_TYPE_CORE_OFFSET_BYTES         = VARIANT_ID_CORE_OFFSET_BYTES + VariantId.SIZE_BYTES
+  private[catalogue] val ITEM_TYPE_GROUP_CORE_OFFSET_BYTES   = ITEM_TYPE_CORE_OFFSET_BYTES + ItemType.SIZE_BYTES
 
-  private[catalogue] val CORE_ATTRIBUTES_SIZE_BYTES = ITEM_TYPE_CORE_OFFSET_BYTES + ItemType.SIZE_BYTES
+  private[catalogue] val CORE_ATTRIBUTES_SIZE_BYTES = ITEM_TYPE_GROUP_CORE_OFFSET_BYTES + ItemType.SIZE_BYTES
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +206,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
       builder.putLongAt(CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES, itemId.cuid)
       builder.putLongAt(VARIANT_ID_CORE_OFFSET_BYTES, variantId.vrtuid)
       builder.putIntAt(ITEM_TYPE_CORE_OFFSET_BYTES, itemType.id)
+      builder.putIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES, itemType.id)
       builder.endHeader()
     }
 

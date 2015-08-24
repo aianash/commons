@@ -13,6 +13,8 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, pare
   import UnsafeUtil._
   import FastStringUtils._
 
+  def isPrimary = parent.isPrimary
+
   /** Description of function
     *
     * @param Parameter1 - blah blah
@@ -61,11 +63,11 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, pare
   def getString(): String =
     FAST_STRING_IMPLEMENTATION.getString(_underlying, pos)
 
-  /** Description of function
+  /** @inheritdoc
     *
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def binary = parent.binary
+  def truncateTo(segmentIdx: Int) = parent.truncateTo(segmentIdx)
 
 }
