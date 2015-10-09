@@ -7,6 +7,7 @@ import items._
 
 import org.scalatest._
 
-class ClothingSpex extends UnitSpec {
+@Ignore
+class ClothingSpec extends UnitSpec {
 
 }
