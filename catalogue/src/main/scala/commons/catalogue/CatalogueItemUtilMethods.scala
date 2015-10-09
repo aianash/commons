@@ -21,9 +21,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte]) =
     itemTypeGroupOf(binary) match {
-      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary)
-      case ItemType.Clothing           => items.Clothing(binary)
-      case _                           => throw new IllegalArgumentException("This item type is not yet implemented")
+      // case ItemTypeGroup.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary)
+      case ItemTypeGroup.Clothing => items.Clothing(binary)
+      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   /** Description of function
@@ -33,9 +33,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte], brandItem: CatalogueItem) =
     itemTypeGroupOf(binary) match {
-      case ItemType.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary, brandItem)
-      case ItemType.Clothing           => items.Clothing(binary, brandItem)
-      case _                           => throw new IllegalArgumentException("This item type is not yet implemented")
+      // case ItemTypeGroup.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary, brandItem)
+      case ItemTypeGroup.Clothing => items.Clothing(binary, brandItem)
+      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   /** Description of function
@@ -45,9 +45,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(memory: Memory) =
     itemTypeGroupOf(memory.underlying) match {
-      case ItemType.MensPoloNeckTShirt => new items.MensPoloNeckTShirt(memory)
-      case ItemType.Clothing           => new items.Clothing(memory)
-      case _                           => throw new IllegalArgumentException("This item type is not yet implemented")
+      // case ItemTypeGroup.MensPoloNeckTShirt => new items.MensPoloNeckTShirt(memory)
+      case ItemTypeGroup.Clothing => new items.Clothing(memory)
+      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   def itemIdOf(binary: Array[Byte]): CatalogueItemId =
@@ -66,31 +66,15 @@ trait CatalogueItemUtilMethods {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def itemTypeOf(binary: Array[Byte]): ItemType =
-    ItemType(UNSAFE.getInt(binary, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_CORE_OFFSET_BYTES))
+  def itemTypeGroupOf(binary: Array[Byte]): ItemTypeGroup =
+    ItemTypeGroup(UNSAFE.getInt(binary, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_GROUP_CORE_OFFSET_BYTES))
 
   /** Description of function
     *
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def itemTypeOf(memory: Memory): ItemType =
-    itemTypeOf(memory.underlying)
-
-  /** Description of function
-    *
-    * @param Parameter1 - blah blah
-    * @return Return value - blah blah
-    */
-  def itemTypeGroupOf(binary: Array[Byte]): ItemType =
-    ItemType(UNSAFE.getInt(binary, BYTE_ARRAY_BASE_OFFSET + CatalogueItem.ITEM_TYPE_GROUP_CORE_OFFSET_BYTES))
-
-  /** Description of function
-    *
-    * @param Parameter1 - blah blah
-    * @return Return value - blah blah
-    */
-  def itemTypeGroupOf(memory: Memory): ItemType =
+  def itemTypeGroupOf(memory: Memory): ItemTypeGroup =
     itemTypeGroupOf(memory.underlying)
 
   /** Description of function
@@ -115,8 +99,9 @@ trait CatalogueItemUtilMethods {
     * @return Return value - blah blah
     */
   def compatible(binary: Array[Byte], to: Memory) = {
-    (itemTypeGroupOf(binary) >> itemTypeGroupOf(to.underlying)) &&
-    (itemTypeOf(binary) eq itemTypeOf(to))
+    (itemTypeGroupOf(binary) >> itemTypeGroupOf(to.underlying))
+     // &&
+    // (itemTypeOf(binary) eq itemTypeOf(to))
   }
 
 }

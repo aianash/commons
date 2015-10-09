@@ -25,4 +25,6 @@ case class ClothingSizes(values: Seq[ClothingSize.ClothingSize]) extends {
 }
 
 
-object ClothingSizes extends VariableSizeAttributeConstants
+object ClothingSizes extends VariableSizeAttributeConstants {
+  def read(prepared: PreparedMemory) = ClothingSizes(Seq.empty[ClothingSize.ClothingSize])
+}
