@@ -6,9 +6,11 @@ import commons.catalogue.items.MensPoloNeckTShirt
 
 import org.scalatest._
 
+
 class MensPoloNeckTShirtSpec extends UnitSpec {
 
   "MensPoloNeckTShirt" should {
+
     "be able to create a brand item" in {
       Given("all the attributes")
       val brandId = BrandId(12345L)
@@ -89,13 +91,15 @@ class MensPoloNeckTShirtSpec extends UnitSpec {
       assert(item.price equals price)
 
       And("we can construct Clothing from it")
-      val clothing = new commons.catalogue.items.Clothing(item.memory)
+      val clothing = item.asClothing
       assert(clothing.brand equals brand)
       assert(clothing.price equals price)
       assert(clothing.itemType equals ItemType.MensPoloNeckTShirt)
       assert(clothing.itemTypeGroup equals ItemType.Clothing)
       assert(clothing.itemType.toString equals "MensPoloNeckTShirt")
       assert(ItemType("Clothing") equals ItemType.Clothing)
+
+      val anotherClothing = CatalogueItem(clothing.memory.underlying, brandItem)
 
       info("Then it was able to correctly build MensPoloNeckTShirt Store Item using a Brand Item")
     }
