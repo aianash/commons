@@ -36,6 +36,14 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, pare
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
+  def getShort(): Short =
+    UNSAFE.getShort(_underlying, BYTE_ARRAY_BASE_OFFSET + pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def getInt(): Int =
     UNSAFE.getInt(_underlying, BYTE_ARRAY_BASE_OFFSET + pos)
 

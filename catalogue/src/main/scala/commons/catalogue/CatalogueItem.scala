@@ -20,14 +20,13 @@ abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equa
   import UnsafeUtil._
   import CatalogueItem._
 
-  val itemType: ItemType = ItemType(memory.getIntAt(ITEM_TYPE_CORE_OFFSET_BYTES))
-  def itemTypeGroup: ItemType
+  val itemTypeGroup: ItemTypeGroup = ItemTypeGroup(memory.getIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES))
 
-  require(itemTypeGroup equals ItemType(memory.getIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES)),
-    new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
+  // set by inheriting class just for sanity checks
+  protected def instanceItemTypeGroup: ItemTypeGroup
 
-  require(itemTypeGroup >> itemType, //.getClass isAssignableFrom itemType.getClass,
-    new IllegalArgumentException("ItemType from array doesnot match itemType of the instantiating catalogue item subclass"))
+  require(instanceItemTypeGroup >> itemTypeGroup,
+    new IllegalArgumentException("ItemTypeGroup from array doesnot match itemType of the instantiating catalogue item subclass"))
 
   private val numSegments = memory.getShortAt(CORE_ATTRIBUTES_SIZE_BYTES)
 
@@ -56,7 +55,7 @@ abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equa
     ProductTitle.read(prepared)
   }
 
-  protected def afterItemTypeGroupIsSetTo(memory: Memory, itemTypeGroup: ItemType) = {
+  protected def afterItemTypeGroupIsSetTo(memory: Memory, itemTypeGroup: ItemTypeGroup) = {
     UNSAFE.putInt(memory.underlying, BYTE_ARRAY_BASE_OFFSET + ITEM_TYPE_GROUP_CORE_OFFSET_BYTES, itemTypeGroup.id)
     memory
   }
@@ -100,10 +99,9 @@ object CatalogueItem extends CatalogueItemUtilMethods {
   private[catalogue] val OWNER_ID_CORE_OFFSET_BYTES          = 0
   private[catalogue] val CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES = OWNER_ID_CORE_OFFSET_BYTES + OwnerId.SIZE_BYTES
   private[catalogue] val VARIANT_ID_CORE_OFFSET_BYTES        = CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES + CatalogueItemId.SIZE_BYTES
-  private[catalogue] val ITEM_TYPE_CORE_OFFSET_BYTES         = VARIANT_ID_CORE_OFFSET_BYTES + VariantId.SIZE_BYTES
-  private[catalogue] val ITEM_TYPE_GROUP_CORE_OFFSET_BYTES   = ITEM_TYPE_CORE_OFFSET_BYTES + ItemType.SIZE_BYTES
+  private[catalogue] val ITEM_TYPE_GROUP_CORE_OFFSET_BYTES   = VARIANT_ID_CORE_OFFSET_BYTES + VariantId.SIZE_BYTES
 
-  private[catalogue] val CORE_ATTRIBUTES_SIZE_BYTES = ITEM_TYPE_GROUP_CORE_OFFSET_BYTES + ItemType.SIZE_BYTES
+  private[catalogue] val CORE_ATTRIBUTES_SIZE_BYTES = ITEM_TYPE_GROUP_CORE_OFFSET_BYTES + ItemTypeGroup.SIZE_BYTES
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +150,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     protected def builder: MemoryBuilder
 
     def numSegments: Int
-    def itemType: ItemType
+    def itemTypeGroup: ItemTypeGroup
 
     private var _ownerId: OW = _
     private var _itemId: CatalogueItemId = CatalogueItemId.NULL
@@ -188,7 +186,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     }
 
     def setAttributes() {
-      writeCoreAttributesTo(builder, _ownerId, _itemId, _variantId, itemType)
+      writeCoreAttributesTo(builder, _ownerId, _itemId, _variantId, itemTypeGroup)
       writeTo(builder, _namedType, _title)
     }
 
@@ -199,14 +197,13 @@ object CatalogueItem extends CatalogueItemUtilMethods {
       * @param Parameter1 - blah blah
       * @return Return value - blah blah
       */
-    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OW, itemId: CatalogueItemId, variantId: VariantId, itemType: ItemType) {
+    private def writeCoreAttributesTo(builder: MemoryBuilder, ownerId: OW, itemId: CatalogueItemId, variantId: VariantId, itemTypeGroup: ItemTypeGroup) {
       builder.beginHeader()
       builder.putCharAt(OWNER_ID_CORE_OFFSET_BYTES, ownerId.ownerType.code)
       builder.putLongAt(OWNER_ID_CORE_OFFSET_BYTES + OwnerType.SIZE_BYTES, ownerId.owuid)
       builder.putLongAt(CATALOGUE_ITEM_ID_CORE_OFFSET_BYTES, itemId.cuid)
       builder.putLongAt(VARIANT_ID_CORE_OFFSET_BYTES, variantId.vrtuid)
-      builder.putIntAt(ITEM_TYPE_CORE_OFFSET_BYTES, itemType.id)
-      builder.putIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES, itemType.id)
+      builder.putIntAt(ITEM_TYPE_GROUP_CORE_OFFSET_BYTES, itemTypeGroup.id)
       builder.endHeader()
     }
 
@@ -242,8 +239,8 @@ object CatalogueItem extends CatalogueItemUtilMethods {
 
     def brandItem: CatalogueItem
 
-    require(brandItem.itemType equals itemType,
-      new IllegalArgumentException("Brand item is not of same itemType as " + itemType.toString))
+    require(brandItem.itemTypeGroup equals itemTypeGroup,
+      new IllegalArgumentException("Brand item is not of same itemTypeGroup as " + itemTypeGroup.toString))
 
     require(brandItem.ownerId.ownerType equals BRAND,
       new IllegalArgumentException("Catalogue items's ownerType is not BRAND"))

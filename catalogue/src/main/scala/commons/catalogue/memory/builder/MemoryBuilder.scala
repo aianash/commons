@@ -204,7 +204,13 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
     atleast
   }
 
-  def putFixedSizeElementArray(arr: Array[_], size: Int) {}
+  def putFixedSizeElementArray(arr: Array[_], eachElementSize: Int) {
+    val atleast = arr.size * eachElementSize + INT_SIZE_BYTES
+    if(pos + atleast > segment.size) resize(atleast)
+    putIntAt(pos, arr.size)
+    pos += INT_SIZE_BYTES
+    
+  }
 
   def putFixedSizeElementArray(arr: Array[_ <: AnyVal]) {
     val elemSize = // optimize this

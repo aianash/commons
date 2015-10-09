@@ -17,7 +17,7 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
 
   import Clothing._
 
-  def itemTypeGroup = ItemType.Clothing
+  override def instanceItemTypeGroup: ItemTypeGroup = ItemTypeGroup.Clothing
 
   /** Description of function
     *
@@ -44,18 +44,40 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def sizes: ClothingSizes = {
-    ???
-  }
+  def sizes: ClothingSizes =
+    ClothingSizes.read(memory.prepareFor(classOf[ClothingSizes], SEGMENT_IDX, SIZES_ATTR_IDX, SIZES_PRIMARY_HEAD_OFFSET))
 
   /** Description of function
     *
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def colors: Colors = {
-    ???
-  }
+  def colors: Colors =
+    Colors.read(memory.prepareFor(classOf[Colors], SEGMENT_IDX, COLORS_ATTR_IDX, COLORS_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def styles: ClothingStyles =
+    ClothingStyles.read(memory.prepareFor(classOf[ClothingStyles], SEGMENT_IDX, CLOTHING_STYLES_ATTR_IDX, CLOTHING_STYLES_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def descr: Description =
+    Description.read(memory.prepareFor(classOf[Description], SEGMENT_IDX, DESCRIPTION_ATTR_IDX, DESCRIPTION_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def gender: Gender =
+    Gender.read(memory.prepareFor(classOf[Gender], SEGMENT_IDX, GENDER_ATTR_IDX, GENDER_PRIMARY_HEAD_OFFSET))
 
   /** Description of function
     *
@@ -63,7 +85,7 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     * @return Return value - blah blah
     */
   def asClothing =
-    new Clothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemType.Clothing))
+    new Clothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemTypeGroup.Clothing))
 
   /** Description of function
     *
@@ -93,42 +115,36 @@ object Clothing {
       new Clothing(memory)
     }
 
-  // CatalogueItem.ownerTypeOf(binary) match {
-  //   case BRAND => new Clothing(PrimaryMemory(binary))
-  //   case _ => throw new IllegalArgumentException("OwnerType of parameters not BRAND")
-  // }
-
   private[catalogue] def apply(binary: Array[Byte], brandItem: CatalogueItem) =
     ifStore(binary, thenWithBrand = brandItem) { memory =>
       new Clothing(memory)
     }
-
-  // CatalogueItem.ownerTypeOf(binary) match {
-  //   case STORE if brandItem.memory.isPrimary && brandItem.isInstanceOf[Clothing] =>
-  //     new Clothing(SecondaryMemory(binary, brandItem.memory))
-  //   case _ =>
-  //     throw new IllegalArgumentException("OwnerType of parameters is not consistent ie binary with STORE and item with BRAND type")
-  // }
 
 
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////// ATTRIBUTE CONSTANTS /////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  val NUM_ATTRIBUTES = 4
+  val NUM_ATTRIBUTES = 6
 
-  val BRAND_ATTR_IDX  = 0
-  val SIZES_ATTR_IDX  = 1
-  val COLORS_ATTR_IDX = 2
-  val PRICE_ATTR_IDX  = 3
+  val BRAND_ATTR_IDX           = 0
+  val SIZES_ATTR_IDX           = 1
+  val COLORS_ATTR_IDX          = 2
+  val PRICE_ATTR_IDX           = 3
+  val CLOTHING_STYLES_ATTR_IDX = 4
+  val DESCRIPTION_ATTR_IDX     = 5
+  val GENDER_ATTR_IDX          = 6
 
-  val BRAND_PRIMARY_HEAD_OFFSET  = 0
-  val SIZES_PRIMARY_HEAD_OFFSET  = BRAND_PRIMARY_HEAD_OFFSET + Brand.HEAD_SIZE_BYTES
-  val COLORS_PRIMARY_HEAD_OFFSET = SIZES_PRIMARY_HEAD_OFFSET + ClothingSizes.HEAD_SIZE_BYTES
-  val PRICE_PRIMARY_HEAD_OFFSET  = COLORS_PRIMARY_HEAD_OFFSET + Colors.HEAD_SIZE_BYTES
+  val BRAND_PRIMARY_HEAD_OFFSET           = 0
+  val SIZES_PRIMARY_HEAD_OFFSET           = BRAND_PRIMARY_HEAD_OFFSET + Brand.HEAD_SIZE_BYTES
+  val COLORS_PRIMARY_HEAD_OFFSET          = SIZES_PRIMARY_HEAD_OFFSET + ClothingSizes.HEAD_SIZE_BYTES
+  val PRICE_PRIMARY_HEAD_OFFSET           = COLORS_PRIMARY_HEAD_OFFSET + Colors.HEAD_SIZE_BYTES
+  val CLOTHING_STYLES_PRIMARY_HEAD_OFFSET = PRICE_PRIMARY_HEAD_OFFSET + Price.HEAD_SIZE_BYTES
+  val DESCRIPTION_PRIMARY_HEAD_OFFSET     = CLOTHING_STYLES_PRIMARY_HEAD_OFFSET + ClothingStyles.HEAD_SIZE_BYTES
+  val GENDER_PRIMARY_HEAD_OFFSET          = DESCRIPTION_PRIMARY_HEAD_OFFSET + Description.HEAD_SIZE_BYTES
 
   val PRIMARY_HEAD_SIZE_BYTES = {
-    val totalSize = PRICE_PRIMARY_HEAD_OFFSET + Price.HEAD_SIZE_BYTES
+    val totalSize = GENDER_PRIMARY_HEAD_OFFSET + Gender.HEAD_SIZE_BYTES
     (totalSize + 7) & ~7
   }
 
@@ -148,27 +164,33 @@ object Clothing {
     private var _price: Price = _
     private var _sizes: ClothingSizes = _
     private var _colors: Colors = _
+    private var _itemStyles: ClothingStyles = _
+    private var _description: Description = _
 
-    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors): B = {
+    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description): B = {
       _brand = brand
       _price = price
       _sizes = sizes
       _colors = colors
+      _itemStyles = itemStyles
+      _description = description
       this
     }
 
-    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors) {
+    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description) {
       builder.begin(NUM_ATTRIBUTES, PRIMARY_HEAD_SIZE_BYTES)
       builder.writeAttr(brand, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(price, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(sizes, SIZES_ATTR_IDX, SIZES_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(colors, COLORS_ATTR_IDX, COLORS_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(itemStyles, CLOTHING_STYLES_ATTR_IDX, CLOTHING_STYLES_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(itemStyles, DESCRIPTION_ATTR_IDX, DESCRIPTION_PRIMARY_HEAD_OFFSET)
       builder.end()
     }
 
     override def setAttributes() = {
       super.setAttributes()
-      writeTo(builder, _brand, _price, _sizes, _colors)
+      writeTo(builder, _brand, _price, _sizes, _colors, _itemStyles, _description)
     }
 
   }
