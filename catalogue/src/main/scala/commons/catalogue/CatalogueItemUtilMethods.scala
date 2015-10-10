@@ -4,6 +4,8 @@ package catalogue
 import core.util.UnsafeUtil
 import memory._
 
+import scalaz._, Scalaz._
+
 
 /** Description of function
   *
@@ -102,6 +104,31 @@ trait CatalogueItemUtilMethods {
     (itemTypeGroupOf(binary) >> itemTypeGroupOf(to.underlying))
      // &&
     // (itemTypeOf(binary) eq itemTypeOf(to))
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def brandBinary(item: CatalogueItem): Array[Byte] = item.memory match {
+    case p: PrimaryMemory   => p.underlying
+    case s: SecondaryMemory => s.primary.underlying
+  }
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def storeBinary(item: CatalogueItem): Option[Array[Byte]] = item.memory match {
+    case _: PrimaryMemory   => none
+    case s: SecondaryMemory => s.underlying.some
+  }
+
+  def binary(item: CatalogueItem, owty: OwnerType): Option[Array[Byte]] = owty match {
+    case STORE => storeBinary(item)
+    case BRAND => brandBinary(item).some
   }
 
 }
