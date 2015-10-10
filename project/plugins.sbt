@@ -24,6 +24,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
 
 addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "3.15.0")
 
-addSbtPlugin("com.goshoplane" % "sbt-standard-libraries" % "0.1.1")
+addSbtPlugin("com.goshoplane" % "sbt-standard-libraries" % "0.1.2")
 
 scalaVersion := "2.10.4"
