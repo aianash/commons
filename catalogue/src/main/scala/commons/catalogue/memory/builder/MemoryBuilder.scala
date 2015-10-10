@@ -196,38 +196,65 @@ private[catalogue] abstract class MemoryBuilder(numSegments: Int) {
     pos += INT_SIZE_BYTES
   }
 
-  def putString(str: String) = {
+  def putString(str: String): Unit = {
     val atleast = FAST_STRING_IMPLEMENTATION.numBytesRequiredToEncode(str)
     if(pos + atleast > segment.size) resize(atleast)
     putStringAt(pos, str)
     pos += atleast
-    atleast
+    // atleast
   }
 
-  def putFixedSizeElementArray(arr: Array[_], eachElementSize: Int) {
-    val atleast = arr.size * eachElementSize + INT_SIZE_BYTES
+  def putStringCollection[M[X] <: TraversableOnce[X]](coll: TraversableOnce[String]): Unit = {
+    var atleast = INT_SIZE_BYTES
+    coll.foreach { str =>
+      atleast += FAST_STRING_IMPLEMENTATION.numBytesRequiredToEncode(str)
+    }
     if(pos + atleast > segment.size) resize(atleast)
-    putIntAt(pos, arr.size)
+
+    putIntAt(pos, coll.size)
     pos += INT_SIZE_BYTES
-    
+
+    for(str <- coll) {
+      pos += putStringAt(pos, str)
+    }
   }
 
-  def putFixedSizeElementArray(arr: Array[_ <: AnyVal]) {
-    val elemSize = // optimize this
-      arr(0) match {
-        case _: Boolean => 1
-        case _: Byte    => 1
-        case _: Char    => 1
-        case _: Short   => 2
-        case _: Int     => 4
-        case _: Long    => 8
-        case _: Float   => 4
-        case _: Double  => 8
-        case _          => throw new IllegalArgumentException("Dont understand the type of the array passed")
-      }
-
-    putFixedSizeElementArray(arr, elemSize)
+  def putIntCollection[M[X] <: TraversableOnce[X]](coll: TraversableOnce[Int]): Unit = {
+    val atleast = INT_SIZE_BYTES + coll.size * INT_SIZE_BYTES
+    if(pos + atleast > segment.size) resize(atleast)
+    putIntAt(pos, coll.size)
+    pos += INT_SIZE_BYTES
+    coll.foreach { i =>
+      putIntAt(pos, i)
+      pos += INT_SIZE_BYTES
+    }
   }
+
+  // TODO
+  // def putFixedSizeElementArray(arr: Array[_], eachElementSize: Int) {
+  //   val atleast = arr.size * eachElementSize + INT_SIZE_BYTES
+  //   if(pos + atleast > segment.size) resize(atleast)
+  //   putIntAt(pos, arr.size)
+  //   pos += INT_SIZE_BYTES
+  // }
+
+  // def putFixedSizeElementCollection[T <: AnyVal : ClassTag, M[X] <: TraversableOnce[X]](coll: M[T]) {
+  //   val elemSize =
+  //     arr(0) match {
+  //       case _: Boolean => 1
+  //       case _: Byte    => 1
+  //       case _: Char    => 1
+  //       case _: Short   => 2
+  //       case _: Int     => 4
+  //       case _: Long    => 8
+  //       case _: Float   => 4
+  //       case _: Double  => 8
+  //       case _          => throw new IllegalArgumentException("Dont understand the type of the array passed")
+  //     }
+
+
+  //   putFixedSizeElementArray(arr, elemSize)
+  // }
 
   ///////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// GET METHODS ////////////////////////////////////

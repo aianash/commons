@@ -9,6 +9,8 @@ import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.{MemoryBuilder, PrimaryMemoryBuilder, SecondaryMemoryBuilder}
 import commons.catalogue.memory.{Memory, PrimaryMemory}
 
+import play.api.libs.json._
+
 
 /** Description of function
   *
@@ -74,6 +76,19 @@ abstract class CatalogueItem(private[catalogue] val memory: Memory) extends Equa
     UNSAFE.copyMemory(memory.underlying, BYTE_ARRAY_BASE_OFFSET, arr, BYTE_ARRAY_BASE_OFFSET, OwnerId.SIZE_BYTES + CatalogueItemId.SIZE_BYTES)
     scala.util.hashing.MurmurHash3.bytesHash(arr)
   }
+
+  def json = Json.obj(
+    "cuid"          -> itemId.cuid,
+    "vrtuid"        -> variantId.vrtuid,
+    "owner"         -> Json.obj(
+      "owuid"         -> ownerId.owuid,
+      "type"          -> ownerType.name
+    ),
+    "namedType"     -> namedType.name,
+    "title"         -> productTitle.title,
+    "itemTypeGroup" -> itemTypeGroup.toString,
+    "groups"        -> itemTypeGroup.groups.map(_.toString)
+  )
 
 }
 

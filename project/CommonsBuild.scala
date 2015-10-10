@@ -73,6 +73,7 @@ object CommonsBuild extends Build with StandardLibraries {
       "com.typesafe.akka" %% "akka-testkit" % Version.akka
     ) ++ Libs.scalatest
       ++ Libs.fastutil
+      ++ Libs.playJson
   ).dependsOn(core)
 
   lazy val microservice = Project(

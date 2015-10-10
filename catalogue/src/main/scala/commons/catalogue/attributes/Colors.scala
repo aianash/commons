@@ -9,13 +9,12 @@ case class Colors(values: Seq[String]) extends {
 } with VariableSizeAttribute {
 
   override private[catalogue] def write(builder: MemoryBuilder) {
-    // ???
+    builder.putStringCollection(values)
   }
 
 }
 
 object Colors extends VariableSizeAttributeConstants {
-  def read(prepared: PreparedMemory) = {
-    Colors(Seq.empty[String])
-  }
+  def read(prepared: PreparedMemory) =
+    Colors(prepared.getStringCollection[Seq])
 }

@@ -1,10 +1,17 @@
 package commons.catalogue
 
+import scala.reflect.NameTransformer._
+import scala.util.matching.Regex
+
 import commons.core.util.UnsafeUtil
 
 sealed trait OwnerType {
   def code: Char
+  def name =
+    ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split
+      Regex.quote(NAME_JOIN_STRING)).last
 }
+
 case object STORE extends OwnerType {
   val code = 'S'
 }

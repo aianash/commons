@@ -1,5 +1,7 @@
 package commons.catalogue.memory
 
+import scala.collection.generic.CanBuildFrom
+
 import commons.core.util.{UnsafeUtil, FastStringUtils}
 
 
@@ -8,7 +10,7 @@ import commons.core.util.{UnsafeUtil, FastStringUtils}
   * @param Parameter1 - blah blah
   * @return Return value - blah blah
   */
-private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, parent: Memory) extends Memory(_underlying) {
+private[catalogue] class PreparedMemory(_underlying: Array[Byte], var pos: Int, parent: Memory) extends Memory(_underlying) {
 
   import UnsafeUtil._
   import FastStringUtils._
@@ -70,6 +72,26 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], pos: Int, pare
     */
   def getString(): String =
     FAST_STRING_IMPLEMENTATION.getString(_underlying, pos)
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def getStringCollection[M[X] <: TraversableOnce[X]]()(implicit cbf: CanBuildFrom[Nothing, String, M[String]]): M[String] = {
+    val bldr = cbf()
+    val size = getIntAt(pos)
+    pos += INT_SIZE_BYTES
+
+    for(i <- 0 until size) {
+      val str = getStringAt(pos)
+      bldr += str
+      pos += FAST_STRING_IMPLEMENTATION.numBytesRequiredToEncode(str)
+    }
+
+    bldr.result()
+  }
+
 
   /** @inheritdoc
     *

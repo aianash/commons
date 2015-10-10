@@ -2,6 +2,9 @@ package commons
 package catalogue
 package attributes
 
+import scala.reflect.NameTransformer._
+import scala.util.matching.Regex
+
 import commons.core.util.UnsafeUtil
 import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.PreparedMemory
@@ -13,6 +16,10 @@ class Gender(id: Short) extends {
 
   override private[catalogue] def writeAt(builder: MemoryBuilder, position: Int): Unit =
     builder.putShortAt(position, id)
+
+  override def toString: String =
+    ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split
+      Regex.quote(NAME_JOIN_STRING)).last
 
 }
 

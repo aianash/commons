@@ -7,6 +7,8 @@ import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
 
+import play.api.libs.json._
+
 
 /** Description of function
   *
@@ -76,8 +78,32 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
+  def stylingTips: StylingTips =
+    StylingTips.read(memory.prepareFor(classOf[StylingTips], SEGMENT_IDX, STYLING_TIPS_ATTR_IDX, STYLING_TIPS_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def gender: Gender =
     Gender.read(memory.prepareFor(classOf[Gender], SEGMENT_IDX, GENDER_ATTR_IDX, GENDER_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def images: Images =
+    Images.read(memory.prepareFor(classOf[Images], SEGMENT_IDX, IMAGES_ATTR_IDX, IMAGES_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def itemUrl: ItemUrl =
+    ItemUrl.read(memory.prepareFor(classOf[ItemUrl], SEGMENT_IDX, ITEM_URL_ATTR_IDX, ITEM_URL_PRIMARY_HEAD_OFFSET))
 
   /** Description of function
     *
@@ -96,6 +122,21 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     case _: Clothing => true
     case _ => false
   }
+
+  override def json = super.json ++ Json.obj(
+    "brand"        -> brand.name,
+    "sizes"        -> sizes.values.map(_.name),
+    "colors"       -> colors.values,
+    "price"        -> price.value,
+    "styles"       -> styles.styles.map(_.name),
+    "descr"        -> descr.text,
+    "gender"       -> gender.toString,
+    "stylingTips"  -> stylingTips.text,
+    "images"       -> Json.obj(
+      "primary"       -> images.primary,
+      "alt"           -> Json.arr(images.alt)),
+    "itemUrl"      -> itemUrl.url
+  )
 
 }
 
@@ -125,7 +166,7 @@ object Clothing {
   ///////////////////////////////// ATTRIBUTE CONSTANTS /////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  val NUM_ATTRIBUTES = 6
+  val NUM_ATTRIBUTES = 10
 
   val BRAND_ATTR_IDX           = 0
   val SIZES_ATTR_IDX           = 1
@@ -134,6 +175,9 @@ object Clothing {
   val CLOTHING_STYLES_ATTR_IDX = 4
   val DESCRIPTION_ATTR_IDX     = 5
   val GENDER_ATTR_IDX          = 6
+  val STYLING_TIPS_ATTR_IDX    = 7
+  val IMAGES_ATTR_IDX          = 8
+  val ITEM_URL_ATTR_IDX        = 9
 
   val BRAND_PRIMARY_HEAD_OFFSET           = 0
   val SIZES_PRIMARY_HEAD_OFFSET           = BRAND_PRIMARY_HEAD_OFFSET + Brand.HEAD_SIZE_BYTES
@@ -142,9 +186,12 @@ object Clothing {
   val CLOTHING_STYLES_PRIMARY_HEAD_OFFSET = PRICE_PRIMARY_HEAD_OFFSET + Price.HEAD_SIZE_BYTES
   val DESCRIPTION_PRIMARY_HEAD_OFFSET     = CLOTHING_STYLES_PRIMARY_HEAD_OFFSET + ClothingStyles.HEAD_SIZE_BYTES
   val GENDER_PRIMARY_HEAD_OFFSET          = DESCRIPTION_PRIMARY_HEAD_OFFSET + Description.HEAD_SIZE_BYTES
+  val STYLING_TIPS_PRIMARY_HEAD_OFFSET    = GENDER_PRIMARY_HEAD_OFFSET + Gender.HEAD_SIZE_BYTES
+  val IMAGES_PRIMARY_HEAD_OFFSET          = STYLING_TIPS_PRIMARY_HEAD_OFFSET + StylingTips.HEAD_SIZE_BYTES
+  val ITEM_URL_PRIMARY_HEAD_OFFSET        = IMAGES_PRIMARY_HEAD_OFFSET + Images.HEAD_SIZE_BYTES
 
   val PRIMARY_HEAD_SIZE_BYTES = {
-    val totalSize = GENDER_PRIMARY_HEAD_OFFSET + Gender.HEAD_SIZE_BYTES
+    val totalSize = ITEM_URL_PRIMARY_HEAD_OFFSET + ItemUrl.HEAD_SIZE_BYTES
     (totalSize + 7) & ~7
   }
 
