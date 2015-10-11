@@ -23,9 +23,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte]) =
     itemTypeGroupOf(binary) match {
-      // case ItemTypeGroup.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary)
-      case ItemTypeGroup.Clothing => items.Clothing(binary)
-      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
+      case ItemTypeGroup.MensTShirt => items.MensTShirt(binary)
+      case ItemTypeGroup.Clothing   => items.Clothing(binary)
+      case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   /** Description of function
@@ -35,9 +35,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte], brandItem: CatalogueItem) =
     itemTypeGroupOf(binary) match {
-      // case ItemTypeGroup.MensPoloNeckTShirt => items.MensPoloNeckTShirt(binary, brandItem)
-      case ItemTypeGroup.Clothing => items.Clothing(binary, brandItem)
-      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
+      case ItemTypeGroup.MensTShirt => items.MensTShirt(binary, brandItem)
+      case ItemTypeGroup.Clothing   => items.Clothing(binary, brandItem)
+      case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   /** Description of function
@@ -47,9 +47,9 @@ trait CatalogueItemUtilMethods {
     */
   def apply(memory: Memory) =
     itemTypeGroupOf(memory.underlying) match {
-      // case ItemTypeGroup.MensPoloNeckTShirt => new items.MensPoloNeckTShirt(memory)
-      case ItemTypeGroup.Clothing => new items.Clothing(memory)
-      case _                      => throw new IllegalArgumentException("This item type is not yet implemented")
+      case ItemTypeGroup.MensTShirt => new items.MensTShirt(memory)
+      case ItemTypeGroup.Clothing   => new items.Clothing(memory)
+      case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
     }
 
   def itemIdOf(binary: Array[Byte]): CatalogueItemId =

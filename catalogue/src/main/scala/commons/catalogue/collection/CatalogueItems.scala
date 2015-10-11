@@ -15,7 +15,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
   * @param Parameter1 - blah blah
   * @return Return value - blah blah
   */
-case class CatalogueItems(items: Seq[CatalogueItem]) {
+class CatalogueItems(val items: Seq[CatalogueItem]) {
 
   import UnsafeUtil._
   import CatalogueItem._
@@ -77,6 +77,8 @@ object CatalogueItems {
 
   import UnsafeUtil._
   import CatalogueItem._
+
+  def apply(items: Seq[CatalogueItem]) = new CatalogueItems(items)
 
   /** Description of function
     *
