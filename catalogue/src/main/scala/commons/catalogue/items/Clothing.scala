@@ -213,31 +213,43 @@ object Clothing {
     private var _colors: Colors = _
     private var _itemStyles: ClothingStyles = _
     private var _description: Description = _
+    private var _stylingTips: StylingTips = _
+    private var _gender: Gender = _
+    private var _images: Images = _
+    private var _itemUrl: ItemUrl = _
 
-    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description): B = {
+    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl): B = {
       _brand = brand
       _price = price
       _sizes = sizes
       _colors = colors
       _itemStyles = itemStyles
       _description = description
+      _stylingTips = stylingTips
+      _gender = gender
+      _images = images
+      _itemUrl = itemUrl
       this
     }
 
-    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description) {
+    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl) {
       builder.begin(NUM_ATTRIBUTES, PRIMARY_HEAD_SIZE_BYTES)
       builder.writeAttr(brand, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(price, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(sizes, SIZES_ATTR_IDX, SIZES_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(colors, COLORS_ATTR_IDX, COLORS_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(itemStyles, CLOTHING_STYLES_ATTR_IDX, CLOTHING_STYLES_PRIMARY_HEAD_OFFSET)
-      builder.writeAttr(itemStyles, DESCRIPTION_ATTR_IDX, DESCRIPTION_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(description, DESCRIPTION_ATTR_IDX, DESCRIPTION_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(stylingTips, STYLING_TIPS_ATTR_IDX, STYLING_TIPS_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(gender, GENDER_ATTR_IDX, GENDER_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(images, IMAGES_ATTR_IDX, IMAGES_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(itemUrl, ITEM_URL_ATTR_IDX, ITEM_URL_PRIMARY_HEAD_OFFSET)
       builder.end()
     }
 
     override def setAttributes() = {
       super.setAttributes()
-      writeTo(builder, _brand, _price, _sizes, _colors, _itemStyles, _description)
+      writeTo(builder, _brand, _price, _sizes, _colors, _itemStyles, _description, _stylingTips, _gender, _images, _itemUrl)
     }
 
   }
