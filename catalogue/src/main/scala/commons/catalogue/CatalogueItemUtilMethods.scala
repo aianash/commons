@@ -3,6 +3,7 @@ package catalogue
 
 import core.util.UnsafeUtil
 import memory._
+import owner._
 
 import scalaz._, Scalaz._
 
