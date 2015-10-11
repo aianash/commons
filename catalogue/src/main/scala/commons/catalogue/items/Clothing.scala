@@ -7,6 +7,8 @@ import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
 
+import commons.owner.{BrandId, OwnerId}
+
 import play.api.libs.json._
 
 

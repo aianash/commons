@@ -43,7 +43,7 @@ object CommonsBuild extends Build with StandardLibraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, microservice, catalogue)
+  ) aggregate (core, microservice, catalogue, owner)
 
   lazy val core = Project(
     id = "commons-core",
@@ -74,6 +74,15 @@ object CommonsBuild extends Build with StandardLibraries {
     ) ++ Libs.scalatest
       ++ Libs.fastutil
       ++ Libs.playJson
+  ).dependsOn(core, owner)
+
+  lazy val owner = Project(
+    id = "commons-owner",
+    base = file("owner"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-owner"
   ).dependsOn(core)
 
   lazy val microservice = Project(

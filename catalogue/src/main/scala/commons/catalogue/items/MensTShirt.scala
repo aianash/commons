@@ -4,6 +4,8 @@ import commons.catalogue._
 import commons.catalogue.attributes._
 import commons.catalogue.memory.{Memory, PrimaryMemory, SecondaryMemory}
 
+import commons.owner._
+
 
 class MensTShirt(memory: Memory) extends MensClothing(memory) {
 

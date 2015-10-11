@@ -6,6 +6,7 @@ import scala.collection.JavaConversions._
 
 import core.util.UnsafeUtil
 import memory._
+import owner._
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 

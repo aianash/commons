@@ -2,9 +2,8 @@ package commons.catalogue.items
 
 import commons.catalogue.ItemTypeGroup
 import commons.catalogue.attributes._
-import commons.catalogue.OwnerId
 import commons.catalogue.memory.Memory
-
+import commons.owner.OwnerId
 
 class MensClothing(memory: Memory) extends Clothing(memory) {
 

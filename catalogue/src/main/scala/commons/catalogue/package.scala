@@ -3,8 +3,9 @@ package commons
 import scala.util.control.NonFatal
 import scala.util._
 
-import catalogue.memory._
+import owner._
 
+import catalogue.memory._
 
 package object catalogue {
 
