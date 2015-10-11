@@ -10,9 +10,8 @@ import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.PreparedMemory
 
 
-trait ClothingStyle {
-  val id = stringHash(this.getClass.getName, symmetricSeed)
-  val name = ("[A-Z][a-z]*".r findAllIn toString) mkString(" ")
+class ClothingStyle(val name: String) {
+  val id = stringHash(name, symmetricSeed)
 }
 
 object ClothingStyle {
@@ -23,29 +22,25 @@ object ClothingStyle {
   def apply(id: Int) = vmap(id)
   def apply(name: String) = nmap(name)
 
-  abstract class RegisterClothingStyle extends ClothingStyle {
-
-    override def toString: String =
-      ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split
-        Regex.quote(NAME_JOIN_STRING)).last
-
-    assert(!vmap.isDefinedAt(id), "Duplicate id: " + id)
-
-    vmap(id) = this
-    nmap(name) = this
+  def ++(name: String) = {
+    val s = new ClothingStyle(name)
+    assert(!vmap.isDefinedAt(s.id), "Duplicate id: " + s.id)
+    vmap(s.id) = s
+    nmap(s.name) = s
+    s
   }
 
-  object TeesTop extends RegisterClothingStyle
-  object BodysuitTop extends RegisterClothingStyle
-  object CropTop extends RegisterClothingStyle
-  object TubeTop extends RegisterClothingStyle
-  object PeplumTop extends RegisterClothingStyle
-  object CowlTop extends RegisterClothingStyle
-  object SpaghettiTop extends RegisterClothingStyle
-  object HalterTop extends RegisterClothingStyle
-  object TunicsTop extends RegisterClothingStyle
-  object TanksTop extends RegisterClothingStyle
-  object BasicTop extends RegisterClothingStyle
+  val TeesTop      = ++("Tees Top")
+  val BodysuitTop  = ++("Bodysuit Top")
+  val CropTop      = ++("Crop Top")
+  val TubeTop      = ++("Tube Top")
+  val PeplumTop    = ++("Peplum Top")
+  val CowlTop      = ++("Cowl Top")
+  val SpaghettiTop = ++("Spaghetti Top")
+  val HalterTop    = ++("Halter Top")
+  val TunicsTop    = ++("Tunics Top")
+  val TanksTop     = ++("Tanks Top")
+  val BasicTop     = ++("Basic Top")
 
 }
 
@@ -55,16 +50,14 @@ case class ClothingStyles(styles: Seq[ClothingStyle]) extends {
 } with VariableSizeAttribute {
 
   override private[catalogue] def write(builder: MemoryBuilder): Unit = {
-    // builder.putFixedSizeElementArray(styles.map(_.id))
+    builder.putIntCollection(styles.map(_.id))
   }
 
 }
 
 object ClothingStyles extends VariableSizeAttributeConstants {
 
-  def read(prepared: PreparedMemory) = {
-    // prepared.readFixedSizeElementArray[Int]
-    ClothingStyles(Seq.empty[ClothingStyle]) // implement
-  }
+  def read(prepared: PreparedMemory) =
+    ClothingStyles(prepared.getIntCollection[Seq].map(ClothingStyle(_)))
 
 }

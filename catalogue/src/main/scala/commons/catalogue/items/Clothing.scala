@@ -134,7 +134,7 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     "stylingTips"  -> stylingTips.text,
     "images"       -> Json.obj(
       "primary"       -> images.primary,
-      "alt"           -> Json.arr(images.alt)),
+      "alt"           -> images.alt),
     "itemUrl"      -> itemUrl.url
   )
 

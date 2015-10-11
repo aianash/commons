@@ -92,6 +92,19 @@ private[catalogue] class PreparedMemory(_underlying: Array[Byte], var pos: Int, 
     bldr.result()
   }
 
+  def getIntCollection[M[X] <: TraversableOnce[X]]()(implicit cbf: CanBuildFrom[Nothing, Int, M[Int]]): M[Int] = {
+    val bldr = cbf()
+    val size = getIntAt(pos)
+    pos += INT_SIZE_BYTES
+
+    for(i <- 0 until size) {
+      val str = getIntAt(pos)
+      bldr += str
+      pos += INT_SIZE_BYTES
+    }
+
+    bldr.result()
+  }
 
   /** @inheritdoc
     *
