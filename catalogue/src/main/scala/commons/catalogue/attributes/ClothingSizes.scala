@@ -18,6 +18,8 @@ object ClothingSize {
   def apply(id: Int) = vmap(id)
   def apply(name: String) = nmap(name)
 
+  def sizes = vmap.keySet
+
   def ++(name: String) = {
     val s = new ClothingSize(name)
     assert(!vmap.isDefinedAt(s.id), "Duplicate id: " + s.id)

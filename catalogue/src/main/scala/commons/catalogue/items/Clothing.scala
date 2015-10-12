@@ -26,20 +26,16 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def brand: Brand = {
-    val prepared = memory.prepareFor(classOf[Brand], SEGMENT_IDX, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET)
-    Brand.read(prepared)
-  }
+  def brand: Brand =
+    Brand.read(memory.prepareFor(classOf[Brand], SEGMENT_IDX, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET))
 
   /** Description of function
     *
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
-  def price: Price = {
-    val prepared = memory.prepareFor(classOf[Price], SEGMENT_IDX, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET)
-    Price.read(prepared)
-  }
+  def price: Price =
+    Price.read(memory.prepareFor(classOf[Price], SEGMENT_IDX, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET))
 
   /** Description of function
     *
