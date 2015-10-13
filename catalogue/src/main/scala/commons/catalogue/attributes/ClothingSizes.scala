@@ -33,6 +33,11 @@ object ClothingSize {
   val L   = ++("L")
   val XL  = ++("XL")
   val XXL = ++("XXL")
+  val XS  = ++("XS")
+  val X2S = ++("2XS")
+  val X3S = ++("3XS")
+  val X2L = ++("2XL")
+  val X3L = ++("3XL")
 
 }
 
