@@ -9,6 +9,8 @@ import commons.catalogue.attributes._
 import commons.catalogue.memory.builder.{MemoryBuilder, PrimaryMemoryBuilder, SecondaryMemoryBuilder}
 import commons.catalogue.memory.{Memory, PrimaryMemory}
 
+import commons.owner._
+
 import play.api.libs.json._
 
 

@@ -5,29 +5,29 @@ import commons.catalogue.attributes._
 import commons.catalogue.memory.Memory
 import commons.owner.OwnerId
 
-class MensClothing(memory: Memory) extends Clothing(memory) {
+class WomensClothing(memory: Memory) extends Clothing(memory) {
 
-  import MensClothing._
+  import WomensClothing._
 
   override def instanceItemTypeGroup: ItemTypeGroup = ItemTypeGroup.Clothing
 
-  require(this.gender equals Male,
-    throw new IllegalArgumentException(s"Item with MensClothing instantiated with $gender"))
+  require(this.gender equals Female,
+    throw new IllegalArgumentException(s"Item with WomensClothing instantiated with $gender"))
 
   override def canEqual(that: Any) = that match {
-    case _: MensClothing => true
+    case _: WomensClothing => true
     case _ => false
   }
 
-  def asMensClothing =
-    new MensClothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemTypeGroup.MensClothing))
+  def asWomensClothing =
+    new WomensClothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemTypeGroup.WomensClothing))
 
 }
 
 
-object MensClothing {
+object WomensClothing {
 
-  // MensClothing inherits from Clothing
+  // WomensClothing inherits from Clothing
   val SEGMENT_IDX = Clothing.SEGMENT_IDX + 1
 
   ///////////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ object MensClothing {
 
 
   /////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////// MENSCLOTHING BUILDER //////////////////////////////////
+  ///////////////////////////////// WOMENSCLOTHING BUILDER ////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////
 
   private[catalogue] trait Builder[B <: Builder[B, OW], OW <: OwnerId] extends Clothing.Builder[B, OW] { self: B => }

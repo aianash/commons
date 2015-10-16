@@ -1,4 +1,4 @@
-package commons.catalogue
+package commons.owner
 
 import scala.reflect.NameTransformer._
 import scala.util.matching.Regex
