@@ -12,12 +12,6 @@ sealed trait OwnerType {
       Regex.quote(NAME_JOIN_STRING)).last
 }
 
-case object STORE extends OwnerType {
-  val code = 'S'
-}
-case object BRAND extends OwnerType {
-  val code = 'B'
-}
 
 object OwnerType {
 
@@ -26,6 +20,13 @@ object OwnerType {
   def apply(code: Char) = code match {
     case 'S' => STORE
     case 'B' => BRAND
+  }
+
+  case object STORE extends OwnerType {
+    val code = 'S'
+  }
+  case object BRAND extends OwnerType {
+    val code = 'B'
   }
 
 }
@@ -46,16 +47,18 @@ trait OwnerId {
 }
 
 case class BrandId(bruid: Long) extends OwnerId {
-  def ownerType = BRAND
+  def ownerType = OwnerType.BRAND
   def owuid = bruid
 }
 
 case class StoreId(stuid: Long) extends OwnerId {
-  def ownerType = STORE
+  def ownerType = OwnerType.STORE
   def owuid = stuid
 }
 
 object OwnerId {
+  import OwnerType._
+
   val SIZE_BYTES = OwnerType.SIZE_BYTES + UnsafeUtil.LONG_SIZE_BYTES
 
   def apply(ownerType: OwnerType, owuid: Long) = {

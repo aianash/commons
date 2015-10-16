@@ -16,6 +16,7 @@ import scalaz._, Scalaz._
 trait CatalogueItemUtilMethods {
 
   import UnsafeUtil._
+  import OwnerType._
 
   /** Description of function
     *

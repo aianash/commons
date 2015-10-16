@@ -8,6 +8,7 @@ import owner._
 import catalogue.memory._
 
 package object catalogue {
+  import OwnerType._
 
   /** Description of function
     *

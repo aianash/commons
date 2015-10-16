@@ -21,6 +21,7 @@ class WomensTops(memory: Memory) extends WomensClothing(memory) {
 }
 
 object WomensTops {
+  import OwnerType._
 
   val SEGMENT_IDX = WomensClothing.SEGMENT_IDX + 1
   val TOTAL_SEGMENTS = SEGMENT_IDX + 1

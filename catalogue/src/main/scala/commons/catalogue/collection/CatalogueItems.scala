@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
   */
 class CatalogueItems(val items: Seq[CatalogueItem]) {
 
+  import OwnerType._
   import UnsafeUtil._
   import CatalogueItem._
 

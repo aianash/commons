@@ -259,7 +259,7 @@ object CatalogueItem extends CatalogueItemUtilMethods {
     require(brandItem.itemTypeGroup equals itemTypeGroup,
       new IllegalArgumentException("Brand item is not of same itemTypeGroup as " + itemTypeGroup.toString))
 
-    require(brandItem.ownerId.ownerType equals BRAND,
+    require(brandItem.ownerId.ownerType equals OwnerType.BRAND,
       new IllegalArgumentException("Catalogue items's ownerType is not BRAND"))
 
     protected val builder = {
