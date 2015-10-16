@@ -25,6 +25,7 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte]) =
     itemTypeGroupOf(binary) match {
+      case ItemTypeGroup.WomensTops => items.WomensTops(binary)
       case ItemTypeGroup.MensTShirt => items.MensTShirt(binary)
       case ItemTypeGroup.Clothing   => items.Clothing(binary)
       case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
@@ -37,6 +38,7 @@ trait CatalogueItemUtilMethods {
     */
   def apply(binary: Array[Byte], brandItem: CatalogueItem) =
     itemTypeGroupOf(binary) match {
+      case ItemTypeGroup.WomensTops => items.WomensTops(binary, brandItem)
       case ItemTypeGroup.MensTShirt => items.MensTShirt(binary, brandItem)
       case ItemTypeGroup.Clothing   => items.Clothing(binary, brandItem)
       case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
@@ -49,6 +51,7 @@ trait CatalogueItemUtilMethods {
     */
   def apply(memory: Memory) =
     itemTypeGroupOf(memory.underlying) match {
+      case ItemTypeGroup.WomensTops => new items.WomensTops(memory)
       case ItemTypeGroup.MensTShirt => new items.MensTShirt(memory)
       case ItemTypeGroup.Clothing   => new items.Clothing(memory)
       case _                        => throw new IllegalArgumentException("This item type is not yet implemented")
