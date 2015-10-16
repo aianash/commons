@@ -12,7 +12,7 @@ import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.PreparedMemory
 
 
-class ClothingStyle(val name: String) {
+class ClothingStyle(val name: String) extends java.io.Serializable {
   val id = stringHash(name, symmetricSeed)
 }
 
@@ -61,9 +61,7 @@ object ClothingStyle {
 }
 
 
-case class ClothingStyles(styles: Seq[ClothingStyle]) extends {
-  val sizeInBytes = ClothingStyles.HEAD_SIZE_BYTES
-} with VariableSizeAttribute {
+case class ClothingStyles(styles: Seq[ClothingStyle]) extends VariableSizeAttribute {
 
   override private[catalogue] def write(builder: MemoryBuilder): Unit = {
     builder.putIntCollection(styles.map(_.id))

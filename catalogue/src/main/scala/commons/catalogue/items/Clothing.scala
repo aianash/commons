@@ -106,6 +106,22 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     * @param Parameter1 - blah blah
     * @return Return value - blah blah
     */
+  def fit: ApparelFit =
+    ApparelFit.read(memory.prepareFor(classOf[ApparelFit], SEGMENT_IDX, APPAREL_FIT_ATTR_IDX, APPAREL_FIT_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
+  def fabric: ApparelFabric =
+    ApparelFabric.read(memory.prepareFor(classOf[ApparelFabric], SEGMENT_IDX, APPAREL_FABRIC_ATTR_IDX, APPAREL_FABRIC_PRIMARY_HEAD_OFFSET))
+
+  /** Description of function
+    *
+    * @param Parameter1 - blah blah
+    * @return Return value - blah blah
+    */
   def asClothing =
     new Clothing(afterItemTypeGroupIsSetTo(memory.truncateTo(SEGMENT_IDX), ItemTypeGroup.Clothing))
 
@@ -128,6 +144,8 @@ class Clothing(memory: Memory) extends CatalogueItem(memory) {
     "descr"        -> descr.text,
     "gender"       -> gender.toString,
     "stylingTips"  -> stylingTips.text,
+    "fit"          -> fit.fit,
+    "fabric"       -> fabric.fabric,
     "images"       -> Json.obj(
       "primary"       -> images.primary,
       "alt"           -> images.alt),
@@ -162,7 +180,7 @@ object Clothing {
   ///////////////////////////////// ATTRIBUTE CONSTANTS /////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  val NUM_ATTRIBUTES = 10
+  val NUM_ATTRIBUTES = 12
 
   val BRAND_ATTR_IDX           = 0
   val SIZES_ATTR_IDX           = 1
@@ -174,6 +192,8 @@ object Clothing {
   val STYLING_TIPS_ATTR_IDX    = 7
   val IMAGES_ATTR_IDX          = 8
   val ITEM_URL_ATTR_IDX        = 9
+  val APPAREL_FIT_ATTR_IDX     = 10
+  val APPAREL_FABRIC_ATTR_IDX  = 11
 
   val BRAND_PRIMARY_HEAD_OFFSET           = 0
   val SIZES_PRIMARY_HEAD_OFFSET           = BRAND_PRIMARY_HEAD_OFFSET + Brand.HEAD_SIZE_BYTES
@@ -185,9 +205,11 @@ object Clothing {
   val STYLING_TIPS_PRIMARY_HEAD_OFFSET    = GENDER_PRIMARY_HEAD_OFFSET + Gender.HEAD_SIZE_BYTES
   val IMAGES_PRIMARY_HEAD_OFFSET          = STYLING_TIPS_PRIMARY_HEAD_OFFSET + StylingTips.HEAD_SIZE_BYTES
   val ITEM_URL_PRIMARY_HEAD_OFFSET        = IMAGES_PRIMARY_HEAD_OFFSET + Images.HEAD_SIZE_BYTES
+  val APPAREL_FIT_PRIMARY_HEAD_OFFSET     = ITEM_URL_PRIMARY_HEAD_OFFSET + ItemUrl.HEAD_SIZE_BYTES
+  val APPAREL_FABRIC_PRIMARY_HEAD_OFFSET  = APPAREL_FIT_PRIMARY_HEAD_OFFSET + ApparelFit.HEAD_SIZE_BYTES
 
   val PRIMARY_HEAD_SIZE_BYTES = {
-    val totalSize = ITEM_URL_PRIMARY_HEAD_OFFSET + ItemUrl.HEAD_SIZE_BYTES
+    val totalSize = APPAREL_FABRIC_PRIMARY_HEAD_OFFSET + ApparelFabric.HEAD_SIZE_BYTES
     (totalSize + 7) & ~7
   }
 
@@ -213,8 +235,10 @@ object Clothing {
     private var _gender: Gender = _
     private var _images: Images = _
     private var _itemUrl: ItemUrl = _
+    private var _fit: ApparelFit = _
+    private var _fabric: ApparelFabric = _
 
-    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl): B = {
+    def clothing(brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl, fit: ApparelFit, fabric: ApparelFabric): B = {
       _brand = brand
       _price = price
       _sizes = sizes
@@ -225,10 +249,12 @@ object Clothing {
       _gender = gender
       _images = images
       _itemUrl = itemUrl
+      _fit = fit
+      _fabric = fabric
       this
     }
 
-    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl) {
+    def writeTo(builder: MemoryBuilder, brand: Brand, price: Price, sizes: ClothingSizes, colors: Colors, itemStyles: ClothingStyles, description: Description, stylingTips: StylingTips, gender: Gender, images: Images, itemUrl: ItemUrl, fit: ApparelFit, fabric: ApparelFabric) {
       builder.begin(NUM_ATTRIBUTES, PRIMARY_HEAD_SIZE_BYTES)
       builder.writeAttr(brand, BRAND_ATTR_IDX, BRAND_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(price, PRICE_ATTR_IDX, PRICE_PRIMARY_HEAD_OFFSET)
@@ -240,12 +266,14 @@ object Clothing {
       builder.writeAttr(gender, GENDER_ATTR_IDX, GENDER_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(images, IMAGES_ATTR_IDX, IMAGES_PRIMARY_HEAD_OFFSET)
       builder.writeAttr(itemUrl, ITEM_URL_ATTR_IDX, ITEM_URL_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(fit, APPAREL_FIT_ATTR_IDX, APPAREL_FIT_PRIMARY_HEAD_OFFSET)
+      builder.writeAttr(fabric, APPAREL_FABRIC_ATTR_IDX, APPAREL_FABRIC_PRIMARY_HEAD_OFFSET)
       builder.end()
     }
 
     override def setAttributes() = {
       super.setAttributes()
-      writeTo(builder, _brand, _price, _sizes, _colors, _itemStyles, _description, _stylingTips, _gender, _images, _itemUrl)
+      writeTo(builder, _brand, _price, _sizes, _colors, _itemStyles, _description, _stylingTips, _gender, _images, _itemUrl, _fit, _fabric)
     }
 
   }

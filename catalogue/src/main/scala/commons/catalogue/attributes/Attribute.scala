@@ -1,6 +1,7 @@
 package commons.catalogue.attributes
 
 import commons.catalogue.memory.builder.MemoryBuilder
+import commons.catalogue.memory.PreparedMemory
 
 
 /**
@@ -56,4 +57,14 @@ trait VariableSizeAttributeConstants {
 
 trait FixedSizeAttributeConstants {
   private[catalogue] val HEAD_SIZE_BYTES: Int
+}
+
+
+abstract class StringAttribute(value: String) extends VariableSizeAttribute {
+  override private[catalogue] def write(builder: MemoryBuilder): Unit = builder.putString(value)
+}
+
+trait StringAttributeConstants[T] extends VariableSizeAttributeConstants {
+  def instantiate(value: String): T
+  def read(prepared: PreparedMemory): T = instantiate(prepared.getString())
 }

@@ -4,11 +4,8 @@ import commons.catalogue.memory.builder.MemoryBuilder
 import commons.catalogue.memory.PreparedMemory
 
 
-case class Description(text: String) extends VariableSizeAttribute {
-  override private[catalogue] def write(builder: MemoryBuilder): Unit =
-    builder.putString(text)
-}
+case class Description(text: String) extends StringAttribute(text)
 
-object Description extends VariableSizeAttributeConstants {
-  def read(prepared: PreparedMemory) = Description(prepared.getString())
+object Description extends StringAttributeConstants[Description] {
+  def instantiate(value: String) = Description(value)
 }
