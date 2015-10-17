@@ -9,7 +9,7 @@ import commons.core.util.UnsafeUtil.INT_SIZE_BYTES
 
 trait ItemTypeGroup {
   def name: String
-  val id = stringHash(name, symmetricSeed)
+  val id = stringHash(name.toLowerCase, symmetricSeed)
   def groups: Seq[ItemTypeGroup]
   def isLeaf: Boolean
   def leaf: this.type
@@ -33,7 +33,7 @@ object ItemTypeGroup {
   private val _leaves = scala.collection.mutable.Set.empty[ItemTypeGroup]
 
   def apply(id: Int) = vmap(id)
-  def apply(name: String) = nmap(name)
+  def apply(name: String) = nmap(name.toLowerCase)
 
   def leaves: Seq[ItemTypeGroup] = _leaves.toSeq
 
@@ -43,7 +43,7 @@ object ItemTypeGroup {
     assert(!vmap.isDefinedAt(id), "Duplicate id: " + id)
 
     vmap(id) = this
-    nmap(toString) = this
+    nmap(name.toLowerCase) = this
 
     val groups: Seq[ItemTypeGroup] = if(parent != null) parent.groups :+ this else IndexedSeq(this)
     private var _isLeaf = false

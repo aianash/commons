@@ -13,7 +13,7 @@ import commons.catalogue.memory.PreparedMemory
 
 
 class ClothingStyle(val name: String) extends java.io.Serializable {
-  val id = stringHash(name, symmetricSeed)
+  val id = stringHash(name.toLowerCase, symmetricSeed)
 }
 
 object ClothingStyle {
@@ -23,7 +23,7 @@ object ClothingStyle {
   private val grpmap = scala.collection.mutable.Map[ClothingStyle, ItemTypeGroup]()
 
   def apply(id: Int) = vmap(id)
-  def apply(name: String) = nmap(name)
+  def apply(name: String) = nmap(name.toLowerCase)
 
   def styles = vmap.values
 
@@ -33,7 +33,7 @@ object ClothingStyle {
     val s = new ClothingStyle(name)
     assert(!vmap.isDefinedAt(s.id), "Duplicate id: " + s.id)
     vmap(s.id) = s
-    nmap(s.name) = s
+    nmap(s.name.toLowerCase) = s
     s
   }
 
