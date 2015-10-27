@@ -12,7 +12,7 @@ import commons.catalogue.memory.PreparedMemory
  * Inherting class should define two functions for writing
  * to Primary and Secondary memory
  */
-trait Attribute
+trait Attribute extends java.io.Serializable
 
 
 /** Description of function
@@ -33,7 +33,7 @@ trait FixedSizeAttribute extends Attribute {
 
 }
 
-/** 
+/**
   *
   * @param Parameter1 - blah blah
   * @return Return value - blah blah

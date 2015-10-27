@@ -7,7 +7,7 @@ import scala.util.hashing.MurmurHash3.{stringHash, symmetricSeed}
 import commons.core.util.UnsafeUtil.INT_SIZE_BYTES
 
 
-trait ItemTypeGroup {
+trait ItemTypeGroup extends java.io.Serializable {
   def name: String
   val id = stringHash(name.toLowerCase, symmetricSeed)
   def groups: Seq[ItemTypeGroup]

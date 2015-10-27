@@ -39,6 +39,7 @@ object ClothingStyle {
 
   implicit class AddItemTypeGroup(style: ClothingStyle) {
     def ~>(group: ItemTypeGroup) = {
+      assert(group.isLeaf)
       grpmap(style) = group
       style
     }
