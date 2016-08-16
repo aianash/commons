@@ -1,4 +1,4 @@
-package goshoplane.commons.core.services
+package aianonymous.commons.core.services
 
 import scala.util.{Try, Success, Failure}
 
@@ -6,7 +6,7 @@ import akka.actor.{Actor, Props, ActorLogging}
 
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 
-import goshoplane.commons.core.protocols._, Implicits._
+import aianonymous.commons.core.protocols._, Implicits._
 
 /**
  * A strip off of Twitter Snowflake (id generator)

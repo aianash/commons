@@ -1,4 +1,4 @@
-package commons.microservice
+package aianonymous.commons.microservice
 
 import collection.JavaConversions._
 import scala.concurrent.Future
@@ -126,7 +126,7 @@ class Microservice(system: ExtendedActorSystem) extends Extension {
   private def join() {
     logInfo("Joining cluster using seed nodes from zookeeper")
 
-    new EnsurePath(zkSeedPath).ensure(curator.getZookeeperClient())
+    curator.create().creatingParentContainersIfNeeded().forPath(zkSeedPath)
     leaderLatch.start()
 
     var joined = false;
@@ -155,7 +155,7 @@ class Microservice(system: ExtendedActorSystem) extends Extension {
 
     if(!joined) {
       log.error("Microservice couldnot join this Node [{}] to cluster, Hence stopping the ActorSystem", cluster.selfAddress)
-      system.shutdown()
+      system.terminate()
     }
   }
 

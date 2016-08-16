@@ -1,4 +1,4 @@
-package goshoplane.commons.core.protocols
+package aianonymous.commons.core.protocols
 
 // A message used for graceful shutdown
 case object Shutdown
