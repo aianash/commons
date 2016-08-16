@@ -1,4 +1,4 @@
-package commons.microservice
+package aianonymous.commons.microservice
 
 import collection.JavaConversions._
 import scala.concurrent.Future

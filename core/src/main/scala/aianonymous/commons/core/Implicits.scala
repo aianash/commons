@@ -1,3 +1,3 @@
-package goshoplane.commons.core
+package aianonymous.commons.core
 
 object Implicits extends implicits.CassandraImplicits

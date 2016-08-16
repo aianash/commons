@@ -1,4 +1,4 @@
-package goshoplane.commons.core.implicits
+package aianonymous.commons.core.implicits
 
 import scala.concurrent.ExecutionContext
 

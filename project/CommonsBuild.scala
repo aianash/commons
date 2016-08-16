@@ -14,13 +14,13 @@ import sbtassembly.AssemblyPlugin.autoImport._
 
 import com.twitter.scrooge.ScroogeSBT
 
-import com.goshoplane.sbt.standard.libraries.StandardLibraries
+import com.aianonymous.sbt.standard.libraries.StandardLibraries
 
 object CommonsBuild extends Build with StandardLibraries {
   // System.setProperty("akka.mode", "test")
 
   def sharedSettings = Seq(
-    organization := "com.goshoplane",
+    organization := "com.aianonymous",
     version := "0.1.0",
     scalaVersion := Version.scala,
     crossScalaVersions := Seq(Version.scala, "2.10.4"),

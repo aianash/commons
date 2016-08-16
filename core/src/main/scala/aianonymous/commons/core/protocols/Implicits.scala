@@ -1,3 +1,3 @@
-package goshoplane.commons.core.protocols
+package aianonymous.commons.core.protocols
 
 object Implicits extends ReplyableImplicits

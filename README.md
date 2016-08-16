@@ -9,7 +9,7 @@ $ sbt commons-core/publish-local
 
 Then add it to your dependencies as
 ```
-"com.goshoplane" %% "commons-core" % "0.0.1"
+"com.aianonymous" %% "commons-core" % "0.0.1"
 ```
 
 Also make sure you have a local repository as resolver group

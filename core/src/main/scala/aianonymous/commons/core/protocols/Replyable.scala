@@ -1,4 +1,4 @@
-package goshoplane.commons.core.protocols
+package aianonymous.commons.core.protocols
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
