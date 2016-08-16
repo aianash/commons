@@ -12,8 +12,6 @@ import com.typesafe.sbt.SbtStartScript
 
 import sbtassembly.AssemblyPlugin.autoImport._
 
-import com.twitter.scrooge.ScroogeSBT
-
 import com.aianonymous.sbt.standard.libraries.StandardLibraries
 
 object CommonsBuild extends Build with StandardLibraries {
@@ -52,8 +50,7 @@ object CommonsBuild extends Build with StandardLibraries {
     id = "commons-core",
     base = file("core"),
     settings = Project.defaultSettings ++
-      sharedSettings ++
-      ScroogeSBT.newSettings
+      sharedSettings
   ).settings(
     name := "commons-core",
 
