@@ -1,10 +1,10 @@
 package aianonymous.commons.events
 
+case class Position(x: Int, y: Int)
+
 case class ViewEvent(
-  scrollTop    : Int,
-  scrollLeft   : Int,
-  mouseX       : Int,
-  mouseY       : Int,
+  scrollPos    : Position,
+  mousePos     : Position,
   startTime    : Long,
   duration     : Int,
   windowHeight : Int,
@@ -13,15 +13,14 @@ case class ViewEvent(
 
 case class SectionViewEvent(
   sectionId : Int,
-  posX      : Int,
-  posY      : Int,
+  pos       : Position,
   startTime : Long,
   duration  : Int
   )
 
 case class PathEvent(
-  mouseX     : Int,
-  mouseY     : Int,
+  mouseStart : Position,
+  mouseEnd   : Position,
   sectionIds : Seq[Int],
   startTime  : Long,
   duration   : Int

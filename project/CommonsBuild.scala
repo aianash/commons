@@ -108,8 +108,7 @@ object CommonsBuild extends Build with StandardLibraries {
     settings = Project.defaultSettings ++
       sharedSettings
   ).settings(
-    name := "commons-events",
-    libraryDependencies ++= Seq()
+    name := "commons-events"
   )
 
 }
