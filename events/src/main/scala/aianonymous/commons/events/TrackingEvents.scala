@@ -8,9 +8,9 @@ case class PageFragmentView(
   scrollPos    : Position,
   mousePos     : Position,
   windowHeight : Int,
-  windowWidth  : Int
+  windowWidth  : Int,
   startTime    : Long,
-  duration     : Int,
+  duration     : Int
   ) extends TrackingEvent
 
 case class SectionView(
