@@ -7,10 +7,10 @@ sealed trait TrackingEvent
 case class PageFragmentView(
   scrollPos    : Position,
   mousePos     : Position,
-  startTime    : Long,
-  duration     : Int,
   windowHeight : Int,
   windowWidth  : Int
+  startTime    : Long,
+  duration     : Int,
   ) extends TrackingEvent
 
 case class SectionView(
