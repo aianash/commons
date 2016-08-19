@@ -42,7 +42,7 @@ object CommonsBuild extends Build with StandardLibraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, microservice)
+  ) aggregate (core, microservice, events)
 
 
 
@@ -100,5 +100,15 @@ object CommonsBuild extends Build with StandardLibraries {
       ++ Libs.scalatest
       ++ Libs.akkaMultiNodeTestkit
   ).configs(MultiJvm)
+
+
+  lazy val events = Project(
+    id = "commons-events",
+    base = file("events"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-events"
+  )
 
 }
