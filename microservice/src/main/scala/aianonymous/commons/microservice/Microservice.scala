@@ -126,7 +126,9 @@ class Microservice(system: ExtendedActorSystem) extends Extension {
   private def join() {
     logInfo("Joining cluster using seed nodes from zookeeper")
 
-    curator.create().creatingParentContainersIfNeeded().forPath(zkSeedPath)
+    if(curator.checkExists().forPath(zkSeedPath) == null)
+      curator.create().creatingParentContainersIfNeeded().forPath(zkSeedPath)
+
     leaderLatch.start()
 
     var joined = false;
