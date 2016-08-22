@@ -1,6 +1,6 @@
 package aianonymous.commons.events
 
-import java.util.URL
+import java.net.URL
 
 case class Position(x: Int, y: Int)
 
