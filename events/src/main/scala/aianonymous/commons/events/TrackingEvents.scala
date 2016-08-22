@@ -1,5 +1,7 @@
 package aianonymous.commons.events
 
+import java.util.URL
+
 case class Position(x: Int, y: Int)
 
 sealed trait TrackingEvent
@@ -24,3 +26,18 @@ case class MousePath(
   startTime : Long,
   duration  : Int
   ) extends TrackingEvent
+
+case class Scanning(
+  fromPos   : Position,
+  toPos     : Position,
+  startTime : Long,
+  duration  : Int
+  ) extends TrackingEvent
+
+case class EventSession(
+  tokenId   : Long,
+  aianId    : Long,
+  sessionId : Long,
+  startTime : Long,
+  source    : URL,
+  events    : Seq[TrackingEvent])
