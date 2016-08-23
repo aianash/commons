@@ -68,10 +68,14 @@ case class Scanning(
   duration  : Int
   ) extends TrackingEvent
 
-case class EventSession(
-  tokenId   : Long,
-  aianId    : Long,
-  sessionId : Long,
+case class EventsSession(
+  tokenId    : Long,
+  aianId     : Long,
+  sessionId  : Long,
+  pageEvents : Seq[PageEvents])
+
+case class PageEvents(
+  pageId    : Long,
   startTime : Long,
   source    : URL,
   events    : Seq[TrackingEvent])
