@@ -75,6 +75,7 @@ case class EventsSession(
   pageEvents : Seq[PageEvents])
 
 case class PageEvents(
+  sessionId : Long,
   pageId    : Long,
   startTime : Long,
   source    : URL,
