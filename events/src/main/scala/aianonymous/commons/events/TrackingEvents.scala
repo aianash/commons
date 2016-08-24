@@ -96,3 +96,4 @@ case class PageEvents(
   startTime : Long,
   source    : URL,
   events    : Seq[TrackingEvent])
+

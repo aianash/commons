@@ -1,9 +1,9 @@
 package aianonymous.commons.events.templates.v1
 
-import org.msgpack.ScalaMessagePack
-
 import scalaz._, Scalaz._
 import scalaz.std.option._
+
+import org.msgpack.ScalaMessagePack
 
 import aianonymous.commons.events._
 
