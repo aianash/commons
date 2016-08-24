@@ -4,6 +4,8 @@ import scala.reflect._
 
 import java.net.URL
 
+import aianonymous.commons.events.templates._
+
 case class Position(x: Int, y: Int)
 
 sealed trait TrackingEvent
@@ -37,6 +39,20 @@ object TrackingEvent {
       case _: Scanning         => SCANNING
       case _                   => 'u'
     }
+  }
+
+  def encode(trackingEvent: TrackingEvent, version: Int): Option[Array[Byte]] =
+    version match {
+      case 1 =>
+        v1.TrackingEventCodec.encode(trackingEvent)
+      case _ => None
+  }
+
+  def decode(serialized: Array[Byte], eventType: Char, version: Int): Option[TrackingEvent] =
+    version match {
+      case 1 =>
+        v1.TrackingEventCodec.decode(serialized, eventType)
+      case _ => None
   }
 }
 
