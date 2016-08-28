@@ -42,7 +42,7 @@ object CommonsBuild extends Build with StandardLibraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, microservice, events)
+  ) aggregate (core, microservice, events, customer)
 
 
 
@@ -113,6 +113,16 @@ object CommonsBuild extends Build with StandardLibraries {
     libraryDependencies ++= Seq(
     ) ++ Libs.msgpack
       ++ Libs.scalaz
+  )
+
+
+  lazy val customer = Project(
+    id = "commons-customer",
+    base = file("customer"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+  ).settings(
+    name := "commons-customer"
   )
 
 }
