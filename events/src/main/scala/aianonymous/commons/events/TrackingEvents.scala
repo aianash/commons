@@ -94,6 +94,5 @@ case class PageEvents(
   sessionId : Long,
   pageId    : Long,
   startTime : Long,
-  source    : URL,
   events    : Seq[TrackingEvent])
 
