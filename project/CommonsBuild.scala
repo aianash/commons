@@ -122,7 +122,9 @@ object CommonsBuild extends Build with StandardLibraries {
     settings = Project.defaultSettings ++
       sharedSettings
   ).settings(
-    name := "commons-customer"
+    name := "commons-customer",
+    libraryDependencies ++= Seq(
+    ) ++ Libs.playJson
   )
 
 }
