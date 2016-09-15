@@ -13,7 +13,7 @@ trait BehaviorJsonCombinator {
 
   implicit val distributionParamsFormat: Format[DistributionParams] = (
     (__ \ "mean").format[String] and
-    (__ \ "variance").format[String]
+    (__ \ "var").format[String]
   ) (
     (mean, variance) => DistributionParams(mean.toDouble, variance.toDouble),
     (params: DistributionParams) => (params.mean.toString, params.variance.toString)
@@ -25,15 +25,6 @@ trait BehaviorJsonCombinator {
   ) (
     (prior, posterior) => Information(TagDistribution(prior), TagDistribution(posterior)),
     (information: Information) => (information.prior.prob, information.posterior.prob)
-  )
-
-  private implicit val sectionDistributionFormat: Format[(PageSection, DistributionParams)] = (
-    (__ \ "sectionId").format[String] and
-    (__ \ "name").format[String] and
-    (__ \ "dist").format[DistributionParams]
-  ) (
-    (sectionId, name, dist) => PageSection(sectionId.toInt, name) -> dist,
-    (sd: (PageSection, DistributionParams)) => (sd._1.sectionId.toString, sd._1.name, sd._2)
   )
 
   implicit val timelineStatsFormat: Format[TimelineStats] = (
@@ -70,6 +61,18 @@ trait BehaviorJsonCombinator {
         }
       )
     }
+  )
+
+  private implicit val sectionDistributionFormat: Format[(PageSection, DistributionParams)] = (
+    (__ \ "sectionId").format[String] and
+    (__ \ "name").format[String] and
+    (__ \ "mean").format[String] and
+    (__ \ "var").format[String]
+  ) (
+    (sectionId, name, mean, variance) =>
+      PageSection(sectionId.toInt, name) -> DistributionParams(mean.toDouble, variance.toDouble),
+    (sd: (PageSection, DistributionParams)) =>
+      (sd._1.sectionId.toString, sd._1.name, sd._2.mean.toString, sd._2.variance.toString)
   )
 
   implicit val timelineFormat: Format[Timeline] = (
