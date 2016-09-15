@@ -11,7 +11,6 @@ import org.joda.time.Duration
 
 case class InstanceId(val inuuid: Int) extends AnyVal
 case class BehaviorId(val bhuuid: Long) extends AnyVal
-case class ActionId(val acuuid: Long) extends AnyVal
 
 //
 case class Behavior(
@@ -53,25 +52,28 @@ object Behavior {
   /////////////////
 
   //
-  case class TagDistribution(prob: Map[String, (Double, Double)]) {
-    def tags = prob.keys
-    def means = prob.map(t => t._1 -> t._2._1)
-    def variances = prob.map(t => t._1 -> t._2._2)
+  case class DistributionParams(mean: Double, variance: Double)
 
-    def mean(tag: String) = prob.get(tag).map(_._1)
-    def variance(tag: String) = prob.get(tag).map(_._2)
+  //
+  case class TagDistribution(prob: Map[String, DistributionParams]) {
+    def tags = prob.keys
+    def means = prob.map(t => t._1 -> t._2.mean)
+    def variances = prob.map(t => t._1 -> t._2.variance)
+
+    def mean(tag: String) = prob.get(tag).map(_.mean)
+    def variance(tag: String) = prob.get(tag).map(_.variance)
   }
 
   //
-  case class SectionDistribution(prob: Map[Int, (PageSection, Double, Double)]) {
+  case class SectionDistribution(prob: Map[Int, (PageSection, DistributionParams)]) {
     def sections = prob.values.map(_._1)
-    def means = prob.values.map(t => t._1 -> t._2)
-    def variance = prob.values.map(t => t._1 -> t._3)
+    def means = prob.values.map(t => t._1 -> t._2.mean)
+    def variance = prob.values.map(t => t._1 -> t._2.variance)
 
-    def mean(sectionId: Int) = prob.get(sectionId).map(_._2)
-    def variance(sectionId: Int) = prob.get(sectionId).map(_._3)
+    def mean(sectionId: Int) = prob.get(sectionId).map(_._2.mean)
+    def variance(sectionId: Int) = prob.get(sectionId).map(_._2.variance)
 
-    def probability(sectionId: Int) = prob.get(sectionId).map(t => t._2 -> t._3)
+    def probability(sectionId: Int) = prob.get(sectionId).map(t => t._2)
   }
 
   //
@@ -84,19 +86,19 @@ object Behavior {
   ///////////
 
   //
-  case class Action(category: String, name: String, label: String, stats: Map[String, (String, Long)])
-  case class StepUserStats(reached: Long, dropped: Long, continued: Long)
+  case class Action(category: String, name: String, label: String, stats: Map[String, Seq[(String, Long)]])
+  case class TimelineStats(reach: Long, drop: Long)
 
   //
-  case class Step(
+  case class Timeline(
     durationIntoPage : Duration,
     sections         : SectionDistribution,
-    distribution     : TagDistribution,
-    userStats        : StepUserStats,
+    tags             : TagDistribution,
+    stats            : TimelineStats,
     actions          : Set[Action])
 
   //
   case class Story(
     information : Information,
-    steps       : Seq[Step])
+    timeline    : IndexedSeq[Timeline])
 }
