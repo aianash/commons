@@ -42,7 +42,7 @@ object CommonsBuild extends Build with StandardLibraries {
   ).settings(
     libraryDependencies ++= Seq(
     ) ++ Libs.akka
-  ) aggregate (core, microservice, events, customer)
+  ) aggregate (core, microservice, events, customer, behavior)
 
 
 
@@ -127,4 +127,15 @@ object CommonsBuild extends Build with StandardLibraries {
     ) ++ Libs.playJson
   )
 
+
+  lazy val behavior = Project(
+    id = "commons-behavior",
+    base = file("behavior"),
+    settings = Project.defaultSettings ++
+      sharedSettings
+    ).settings(
+      name := "commons-behavior",
+      libraryDependencies ++= Seq(
+      ) ++ Libs.playJson
+    )
 }
