@@ -21,6 +21,9 @@ case class Behavior(
 //
 object Behavior {
 
+  // [TODO] move some where else
+  case class PageSection(sectionId: Int, name: String)
+
   ///////////
   // Stats //
   ///////////
@@ -32,6 +35,7 @@ object Behavior {
   //
   case class Referral(
     pageId : Long,
+    name   : String,
     score  : Float,
     url    : URL)
 
@@ -49,7 +53,7 @@ object Behavior {
   /////////////////
 
   //
-  case class Distribution(prob: Map[String, (Double, Double)]) {
+  case class TagDistribution(prob: Map[String, (Double, Double)]) {
     def tags = prob.keys
     def means = prob.map(t => t._1 -> t._2._1)
     def variances = prob.map(t => t._1 -> t._2._2)
@@ -59,16 +63,25 @@ object Behavior {
   }
 
   //
+  case class SectionDistribution(prob: Map[Int, (PageSection, Double, Double)]) {
+    def sections = prob.values.map(_._1)
+    def means = prob.values.map(t => t._1 -> t._2)
+    def variance = prob.values.map(t => t._1 -> t._3)
+
+    def mean(sectionId: Int) = prob.get(sectionId).map(_._2)
+    def variance(sectionId: Int) = prob.get(sectionId).map(_._3)
+
+    def probability(sectionId: Int) = prob.get(sectionId).map(t => t._2 -> t._3)
+  }
+
+  //
   case class Information(
-    prior     : Distribution,
-    posterior : Distribution)
+    prior     : TagDistribution,
+    posterior : TagDistribution)
 
   ///////////
   // Story //
   ///////////
-
-  // [TODO] move some where else
-  case class PageSection(sectionId: Int, name: String)
 
   //
   case class Action(category: String, name: String, label: String, stats: Map[String, (String, Long)])
@@ -77,8 +90,8 @@ object Behavior {
   //
   case class Step(
     durationIntoPage : Duration,
-    section          : PageSection,
-    distribution     : Distribution,
+    sections         : SectionDistribution,
+    distribution     : TagDistribution,
     userStats        : StepUserStats,
     actions          : Set[Action])
 
