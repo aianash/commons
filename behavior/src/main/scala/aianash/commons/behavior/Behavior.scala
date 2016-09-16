@@ -35,7 +35,7 @@ object Behavior {
   case class Referral(
     pageId : Long,
     name   : String,
-    score  : Float,
+    count  : Long,
     url    : URL)
 
   //

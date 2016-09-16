@@ -111,13 +111,13 @@ trait BehaviorJsonCombinator {
   implicit val referralFormat: Format[Referral] = (
     (__ \ "pageId").format[String] and
     (__ \ "name").format[String] and
-    (__ \ "score").format[String] and
+    (__ \ "count").format[String] and
     (__ \ "url").format[String]
   ) (
-    (pageId, name, score, url) => Referral(pageId.toLong, name, score.toFloat, new URL(url)),
+    (pageId, name, count, url) => Referral(pageId.toLong, name, count.toLong, new URL(url)),
     (referral: Referral) => {
       import referral._
-      (pageId.toString, name, score.toString, url.toString)
+      (pageId.toString, name, count.toString, url.toString)
     }
   )
 
