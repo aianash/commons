@@ -90,7 +90,7 @@ object Behavior {
   case class TimelineStats(reach: Long, drop: Long)
 
   //
-  case class Timeline(
+  case class TimelineEvent(
     durationIntoPage : Duration,
     sections         : SectionDistribution,
     tags             : TagDistribution,
@@ -100,5 +100,5 @@ object Behavior {
   //
   case class Story(
     information : Information,
-    timeline    : IndexedSeq[Timeline])
+    timeline    : IndexedSeq[TimelineEvent])
 }
