@@ -125,7 +125,7 @@ object CommonsBuild extends Build with StandardLibraries {
     name := "commons-customer",
     libraryDependencies ++= Seq(
     ) ++ Libs.playJson
-  )
+  ).dependsOn(core)
 
 
   lazy val behavior = Project(
