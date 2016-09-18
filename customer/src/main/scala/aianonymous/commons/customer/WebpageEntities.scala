@@ -1,12 +1,15 @@
 package aianonymous.commons.customer
 
+import aianonymous.commons.core.PageURL
+
 case class Domain(
   tokenId : Long,
   name    : String
   )
 
-case class PageURL(
+case class WebPage(
   tokenId : Long,
   pageId  : Long,
-  url     : String
+  url     : PageURL,
+  name    : String
   )
