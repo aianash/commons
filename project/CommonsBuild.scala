@@ -137,5 +137,5 @@ object CommonsBuild extends Build with StandardLibraries {
       name := "commons-behavior",
       libraryDependencies ++= Seq(
       ) ++ Libs.playJson
-    )
+    ).dependsOn(core)
 }
