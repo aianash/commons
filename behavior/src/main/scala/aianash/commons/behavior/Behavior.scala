@@ -1,8 +1,8 @@
 package aianash.commons.behavior
 
-import java.net.URL
-
 import org.joda.time.Duration
+
+import aianonymous.commons.core.PageURL
 
 
 /////////
@@ -36,7 +36,7 @@ object Behavior {
     pageId : Long,
     name   : String,
     count  : Long,
-    url    : URL)
+    url    : PageURL)
 
   //
   case class Stats(
