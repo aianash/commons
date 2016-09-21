@@ -2,7 +2,7 @@ package aianash.commons.behavior
 
 import org.joda.time.Duration
 
-import aianonymous.commons.core._
+import aianonymous.commons.core.PageURL
 
 
 /////////
