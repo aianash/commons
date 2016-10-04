@@ -1,10 +1,14 @@
-package aianonymous.commons.events
+package aianash.commons.events
 
+import org.joda.time.{Duration, DateTime}
 import scala.reflect._
 
-import java.net.URL
+import aianash.commons.events.templates._
 
-import aianonymous.commons.events.templates._
+case class TokenId(val tkuuid: Long) extends AnyVal
+case class AianId(val anuuid: Long) extends AnyVal
+case class PageId(val pguuid: Long) extends AnyVal
+case class SessionId(val snuuid: Long) extends AnyVal
 
 case class Position(x: Int, y: Int)
 
@@ -17,6 +21,7 @@ object TrackingEvent {
     val SECTION_VIEW       = 's'
     val MOUSE_PATH         = 'p'
     val SCANNING           = 'r'
+    val ACTION             = 'a'
   }
 
   def codeFor[T <: TrackingEvent : ClassTag] = {
@@ -26,6 +31,7 @@ object TrackingEvent {
       case _ if classTag[T] == classTag[SectionView]      => SECTION_VIEW
       case _ if classTag[T] == classTag[MousePath]        => MOUSE_PATH
       case _ if classTag[T] == classTag[Scanning]         => SCANNING
+      case _ if classTag[T] == classTag[Action]           => ACTION
       case _ => 'u'
     }
   }
@@ -37,6 +43,7 @@ object TrackingEvent {
       case _: SectionView      => SECTION_VIEW
       case _: MousePath        => MOUSE_PATH
       case _: Scanning         => SCANNING
+      case _: Action           => ACTION
       case _                   => 'u'
     }
   }
@@ -57,42 +64,47 @@ object TrackingEvent {
 }
 
 case class PageFragmentView(
+  pageId       : PageId,
   scrollPos    : Position,
   windowHeight : Int,
   windowWidth  : Int,
-  startTime    : Long,
-  duration     : Int
+  startTime    : DateTime,
+  duration     : Duration
   ) extends TrackingEvent
 
 case class SectionView(
+  pageId    : PageId,
   sectionId : Int,
   pos       : Position,
-  startTime : Long,
-  duration  : Int
+  startTime : DateTime,
+  duration  : Duration
   ) extends TrackingEvent
 
 case class MousePath(
+  pageId    : PageId,
   sections  : Seq[(Int, Position)],
-  startTime : Long,
-  duration  : Int
+  startTime : DateTime,
+  duration  : Duration
   ) extends TrackingEvent
 
 case class Scanning(
+  pageId    : PageId,
   fromPos   : Position,
   toPos     : Position,
-  startTime : Long,
-  duration  : Int
+  startTime : DateTime,
+  duration  : Duration
+  ) extends TrackingEvent
+
+case class Action(
+  pageId     : PageId,
+  timeStamp  : DateTime,
+  name       : String,
+  props      : Map[String, String]
   ) extends TrackingEvent
 
 case class EventsSession(
-  tokenId    : Long,
-  aianId     : Long,
-  sessionId  : Long,
-  pageEvents : Seq[PageEvents])
-
-case class PageEvents(
-  sessionId : Long,
-  pageId    : Long,
-  startTime : Long,
-  events    : Seq[TrackingEvent])
+  tokenId    : TokenId,
+  aianId     : AianId,
+  sessionId  : SessionId,
+  events     : Seq[TrackingEvent])
 

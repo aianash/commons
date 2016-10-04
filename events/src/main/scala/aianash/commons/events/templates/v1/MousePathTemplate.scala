@@ -1,12 +1,14 @@
-package aianonymous.commons.events.templates.v1
+package aianash.commons.events.templates.v1
 
 import scala.collection.mutable.ArrayBuffer
+
+import org.joda.time.{Duration, DateTime}
 
 import org.msgpack.packer.Packer
 import org.msgpack.unpacker.Unpacker
 import org.msgpack.template.{Templates, AbstractTemplate}
 
-import aianonymous.commons.events._
+import aianash.commons.events._
 
 class MousePathTemplate extends AbstractTemplate[MousePath] {
 
@@ -15,14 +17,15 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(from.sections.size * 3 + 2)
+      packer.writeArrayBegin(from.sections.size * 3 + 3)
+      packer.write(from.pageId.pguuid)
       for(section <- from.sections) {
         packer.write(section._1)
         packer.write(section._2.x)
         packer.write(section._2.y)
       }
-      packer.write(from.startTime)
-      packer.write(from.duration)
+      packer.write(from.startTime.getMillis)
+      packer.write(from.duration.getMillis)
       packer.writeArrayEnd
     }
   }
@@ -32,6 +35,7 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
       null.asInstanceOf[MousePath]
     } else {
       val size = unpacker.readArrayBegin
+      val pageId = unpacker.read(Templates.TLong)
       val sectionsLen: Int = (size - 2) / 3
       val sections = ArrayBuffer.empty[(Int, Position)]
       for(_ <- 0 until sectionsLen) {
@@ -42,10 +46,10 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
         sections += sectionNum -> pos
       }
       val startTime = unpacker.read(Templates.TLong)
-      val duration = unpacker.read(Templates.TInteger)
+      val duration = unpacker.read(Templates.TLong)
       unpacker.readArrayEnd
 
-      MousePath(sections, startTime, duration)
+      MousePath(PageId(pageId), sections, new DateTime(startTime), new Duration(duration))
     }
   }
 }

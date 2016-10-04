@@ -113,6 +113,8 @@ object CommonsBuild extends Build with StandardLibraries {
     libraryDependencies ++= Seq(
     ) ++ Libs.msgpack
       ++ Libs.scalaz
+      ++ Libs.jodaTime
+      ++ Libs.jodaConvert
   )
 
 
