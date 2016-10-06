@@ -12,13 +12,15 @@ import aianash.commons.events._
 
 class MousePathTemplate extends AbstractTemplate[MousePath] {
 
+  implicit val locationTemplate = new LocationTemplate
+
   def write(packer: Packer, from: MousePath, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
       packer.writeArrayBegin(from.sections.size * 3 + 3)
-      packer.write(from.pageId.pguuid)
+      packer.write(from.location)
       for(section <- from.sections) {
         packer.write(section._1)
         packer.write(section._2.x)
@@ -35,7 +37,7 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
       null.asInstanceOf[MousePath]
     } else {
       val size = unpacker.readArrayBegin
-      val pageId = unpacker.read(Templates.TLong)
+      val location = unpacker.read(locationTemplate)
       val sectionsLen: Int = (size - 2) / 3
       val sections = ArrayBuffer.empty[(Int, Position)]
       for(_ <- 0 until sectionsLen) {
@@ -49,7 +51,7 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
       val duration = unpacker.read(Templates.TLong)
       unpacker.readArrayEnd
 
-      MousePath(PageId(pageId), sections, new DateTime(startTime), new Duration(duration))
+      MousePath(location, sections, new DateTime(startTime), new Duration(duration))
     }
   }
 }

@@ -12,13 +12,15 @@ import aianash.commons.events._
 
 class ActionTemplate extends AbstractTemplate[Action] {
 
+  implicit val locationTemplate = new LocationTemplate
+
   def write(packer: Packer, from: Action, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
       packer.writeArrayBegin(4)
-      packer.write(from.pageId.pguuid)
+      packer.write(from.location)
       packer.write(from.timeStamp.getMillis)
       packer.write(from.name)
       packer.write(from.props)
@@ -31,13 +33,13 @@ class ActionTemplate extends AbstractTemplate[Action] {
       null.asInstanceOf[Action]
     } else {
       val size = unpacker.readArrayBegin
-      val pageId = unpacker.read(Templates.TLong)
+      val location = unpacker.read(locationTemplate)
       val timeStamp = unpacker.read(Templates.TLong)
       val name = unpacker.read(Templates.TString)
       val props = unpacker.read(Templates.tMap(Templates.TString, Templates.TString))
       unpacker.readArrayEnd
 
-      Action(PageId(pageId), new DateTime(timeStamp), name, props.toMap)
+      Action(location, new DateTime(timeStamp), name, props.toMap)
     }
   }
 }

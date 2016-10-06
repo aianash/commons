@@ -4,13 +4,19 @@ import org.joda.time.{Duration, DateTime}
 import scala.reflect._
 
 import aianash.commons.events.templates._
+import aianash.commons.events._
 
-case class TokenId(val tkuuid: Long) extends AnyVal
+
+/////////////////////////////////////// Identifier classes ////////////////////////////////////////////
+
 case class AianId(val anuuid: Long) extends AnyVal
-case class PageId(val pguuid: Long) extends AnyVal
 case class SessionId(val snuuid: Long) extends AnyVal
 
+/////////////////////////////////////// Helper classes ////////////////////////////////////////////
+
 case class Position(x: Int, y: Int)
+
+/////////////////////////////////////// TrackingEvent Traits ////////////////////////////////////////////
 
 sealed trait TrackingEvent
 
@@ -63,44 +69,54 @@ object TrackingEvent {
   }
 }
 
+/////////////////////////////////////// Movement classes ////////////////////////////////////////////
+
+sealed trait Movement
+
 case class PageFragmentView(
-  pageId       : PageId,
+  location     : Location,
   scrollPos    : Position,
   windowHeight : Int,
   windowWidth  : Int,
   startTime    : DateTime,
   duration     : Duration
-  ) extends TrackingEvent
+) extends Movement with TrackingEvent
 
 case class SectionView(
-  pageId    : PageId,
-  sectionId : Int,
-  pos       : Position,
-  startTime : DateTime,
-  duration  : Duration
-  ) extends TrackingEvent
+  location     : Location,
+  sectionId    : Int,
+  pos          : Position,
+  startTime    : DateTime,
+  duration     : Duration
+) extends Movement with TrackingEvent
 
 case class MousePath(
-  pageId    : PageId,
-  sections  : Seq[(Int, Position)],
-  startTime : DateTime,
-  duration  : Duration
-  ) extends TrackingEvent
+  location     : Location,
+  sections     : Seq[(Int, Position)],
+  startTime    : DateTime,
+  duration     : Duration
+) extends Movement with TrackingEvent
 
 case class Scanning(
-  pageId    : PageId,
-  fromPos   : Position,
-  toPos     : Position,
-  startTime : DateTime,
-  duration  : Duration
-  ) extends TrackingEvent
+  location     : Location,
+  fromPos      : Position,
+  toPos        : Position,
+  startTime    : DateTime,
+  duration     : Duration
+) extends Movement with TrackingEvent
+
+
+/////////////////////////////////////// Action classes ////////////////////////////////////////////
 
 case class Action(
-  pageId     : PageId,
+  location   : Location,
   timeStamp  : DateTime,
   name       : String,
   props      : Map[String, String]
-  ) extends TrackingEvent
+) extends TrackingEvent
+
+
+/////////////////////////////////////// Session classes ////////////////////////////////////////////
 
 case class EventsSession(
   tokenId    : TokenId,
