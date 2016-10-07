@@ -1,11 +1,11 @@
-package aianonymous.commons.events.templates.v1
+package aianash.commons.events.templates.v1
 
 import scalaz._, Scalaz._
 import scalaz.std.option._
 
 import org.msgpack.ScalaMessagePack
 
-import aianonymous.commons.events._
+import aianash.commons.events._
 
 object TrackingEventCodec {
 
@@ -21,6 +21,8 @@ object TrackingEventCodec {
         ScalaMessagePack.writeT(mp).some
       case sc: Scanning =>
         ScalaMessagePack.writeT(sc).some
+      case ac: Action =>
+        ScalaMessagePack.writeT(ac).some
       case _ => None
   }
 
@@ -36,6 +38,8 @@ object TrackingEventCodec {
         messagePack.read(serialized, mousePathTemplate).some
       case SCANNING =>
         messagePack.read(serialized, scanningTemplate).some
+      case ACTION =>
+        messagePack.read(serialized, actionTemplate).some
       case _ => None
     }
   }
