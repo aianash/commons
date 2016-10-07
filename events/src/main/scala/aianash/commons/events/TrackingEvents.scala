@@ -1,7 +1,10 @@
 package aianash.commons.events
 
-import org.joda.time.{Duration, DateTime}
 import scala.reflect._
+
+import org.joda.time.{Duration, DateTime}
+
+import play.api.libs.json._
 
 import aianash.commons.events.templates._
 import aianash.commons.events._
@@ -9,8 +12,9 @@ import aianash.commons.events._
 
 /////////////////////////////////////// Identifier classes ////////////////////////////////////////////
 
-case class AianId(val anuuid: Long) extends AnyVal
-case class SessionId(val snuuid: Long) extends AnyVal
+case class TokenId(tkuuid: Long) extends AnyVal
+case class AianId(anuuid: Long) extends AnyVal
+case class SessionId(snuuid: Long) extends AnyVal
 
 /////////////////////////////////////// Helper classes ////////////////////////////////////////////
 
@@ -112,15 +116,16 @@ case class Action(
   location   : Location,
   timeStamp  : DateTime,
   name       : String,
-  props      : Map[String, String]
+  props      : JsObject
 ) extends TrackingEvent
 
 
 /////////////////////////////////////// Session classes ////////////////////////////////////////////
 
-case class EventsSession(
+case class EventSession(
   tokenId    : TokenId,
   aianId     : AianId,
   sessionId  : SessionId,
+  startTime  : DateTime,
   events     : Seq[TrackingEvent])
 

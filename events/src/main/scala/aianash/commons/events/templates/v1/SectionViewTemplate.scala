@@ -10,15 +10,13 @@ import aianash.commons.events._
 
 class SectionViewTemplate extends AbstractTemplate[SectionView] {
 
-  implicit val locationTemplate = new LocationTemplate
-
   def write(packer: Packer, from: SectionView, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(6)
-      packer.write(from.location)
+      packer.writeArrayBegin(7)
+      LocationTemplate.write(packer, from.location)
       packer.write(from.sectionId)
       packer.write(from.pos.x)
       packer.write(from.pos.y)
@@ -33,7 +31,8 @@ class SectionViewTemplate extends AbstractTemplate[SectionView] {
       null.asInstanceOf[SectionView]
     } else {
       unpacker.readArrayBegin
-      val location = unpacker.read(locationTemplate)
+      val locationType = unpacker.read(Templates.TCharacter)
+      val location = LocationTemplate.read(unpacker, locationType)
       val sectionId = unpacker.read(Templates.TInteger)
       val posX = unpacker.read(Templates.TInteger)
       val posY = unpacker.read(Templates.TInteger)

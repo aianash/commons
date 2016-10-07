@@ -10,15 +10,13 @@ import aianash.commons.events._
 
 class ScanningTemplate extends AbstractTemplate[Scanning] {
 
-  implicit val locationTemplate = new LocationTemplate
-
   def write(packer: Packer, from: Scanning, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(7)
-      packer.write(from.location)
+      packer.writeArrayBegin(8)
+      LocationTemplate.write(packer, from.location)
       packer.write(from.fromPos.x)
       packer.write(from.fromPos.y)
       packer.write(from.toPos.x)
@@ -34,7 +32,8 @@ class ScanningTemplate extends AbstractTemplate[Scanning] {
       null.asInstanceOf[Scanning]
     } else {
       unpacker.readArrayBegin
-      val location = unpacker.read(locationTemplate)
+      val locationType = unpacker.read(Templates.TCharacter)
+      val location = LocationTemplate.read(unpacker, locationType)
       val fromPosX = unpacker.read(Templates.TInteger)
       val fromPosY = unpacker.read(Templates.TInteger)
       val toPosX = unpacker.read(Templates.TInteger)

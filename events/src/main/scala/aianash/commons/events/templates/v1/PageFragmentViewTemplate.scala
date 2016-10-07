@@ -10,18 +10,13 @@ import aianash.commons.events._
 
 class PageFragmentViewTemplate extends AbstractTemplate[PageFragmentView] {
 
-
-  implicit val webPageTemplate = new WebPageTemplate
-  implicit val appTemplate = new AppTemplate
-  implicit val locationTemplate = new LocationTemplate
-
   def write(packer: Packer, from: PageFragmentView, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
       packer.writeArrayBegin(8)
-      packer.write(from.location)
+      LocationTemplate.write(packer, from.location)
       packer.write(from.scrollPos.x)
       packer.write(from.scrollPos.y)
       packer.write(from.windowHeight)
@@ -37,7 +32,8 @@ class PageFragmentViewTemplate extends AbstractTemplate[PageFragmentView] {
       null.asInstanceOf[PageFragmentView]
     } else {
       unpacker.readArrayBegin
-      val location = unpacker.read(locationTemplate)
+      val locationType = unpacker.read(Templates.TCharacter)
+      val location = LocationTemplate.read(unpacker, locationType)
       val scrollPosX = unpacker.read(Templates.TInteger)
       val scrollPosY = unpacker.read(Templates.TInteger)
       val windowHeight = unpacker.read(Templates.TInteger)

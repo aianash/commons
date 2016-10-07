@@ -13,7 +13,7 @@ class AppTemplate extends AbstractTemplate[App] {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.write(from.tokenId.tkuuid)
+      packer.write(from.appId.appuuid)
       packer.write(from.activityId.actuuid)
     }
   }
@@ -22,9 +22,9 @@ class AppTemplate extends AbstractTemplate[App] {
     if(!required && unpacker.trySkipNil) {
       null.asInstanceOf[App]
     } else {
-      val tokenId = unpacker.read(Templates.TLong)
+      val appId = unpacker.read(Templates.TLong)
       val activityId = unpacker.read(Templates.TLong)
-      App(TokenId(tokenId), ActivityId(activityId))
+      App(AppId(appId), ActivityId(activityId))
     }
   }
 }
