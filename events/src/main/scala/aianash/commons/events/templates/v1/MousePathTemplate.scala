@@ -7,18 +7,22 @@ import org.joda.time.{Duration, DateTime}
 import org.msgpack.packer.Packer
 import org.msgpack.unpacker.Unpacker
 import org.msgpack.template.{Templates, AbstractTemplate}
+import org.msgpack.ScalaMessagePack.messagePack
 
 import aianash.commons.events._
 
 class MousePathTemplate extends AbstractTemplate[MousePath] {
+
+  import Implicits._
 
   def write(packer: Packer, from: MousePath, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(from.sections.size * 3 + 4)
-      LocationTemplate.write(packer, from.location)
+      packer.writeArrayBegin(from.sections.size * 3 + 3)
+      val binary = messagePack.write(from.location, locationTemplate)
+      packer.write(binary)
       for(section <- from.sections) {
         packer.write(section._1)
         packer.write(section._2.x)
@@ -35,8 +39,8 @@ class MousePathTemplate extends AbstractTemplate[MousePath] {
       null.asInstanceOf[MousePath]
     } else {
       val size = unpacker.readArrayBegin
-      val locationType = unpacker.read(Templates.TCharacter)
-      val location = LocationTemplate.read(unpacker, locationType)
+      val binary = unpacker.read(Templates.TByteArray)
+      val location = messagePack.read(binary, locationTemplate)
       val sectionsLen: Int = (size - 2) / 3
       val sections = ArrayBuffer.empty[(Int, Position)]
       for(_ <- 0 until sectionsLen) {

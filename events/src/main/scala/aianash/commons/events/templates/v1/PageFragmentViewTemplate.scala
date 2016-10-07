@@ -5,18 +5,22 @@ import org.joda.time.{Duration, DateTime}
 import org.msgpack.packer.Packer
 import org.msgpack.unpacker.Unpacker
 import org.msgpack.template.{Templates, AbstractTemplate}
+import org.msgpack.ScalaMessagePack.messagePack
 
 import aianash.commons.events._
 
 class PageFragmentViewTemplate extends AbstractTemplate[PageFragmentView] {
+
+  import Implicits._
 
   def write(packer: Packer, from: PageFragmentView, required: Boolean) = {
     if(from == null) {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.writeArrayBegin(8)
-      LocationTemplate.write(packer, from.location)
+      packer.writeArrayBegin(7)
+      val binary = messagePack.write(from.location, locationTemplate)
+      packer.write(binary)
       packer.write(from.scrollPos.x)
       packer.write(from.scrollPos.y)
       packer.write(from.windowHeight)
@@ -32,8 +36,8 @@ class PageFragmentViewTemplate extends AbstractTemplate[PageFragmentView] {
       null.asInstanceOf[PageFragmentView]
     } else {
       unpacker.readArrayBegin
-      val locationType = unpacker.read(Templates.TCharacter)
-      val location = LocationTemplate.read(unpacker, locationType)
+      val binary = unpacker.read(Templates.TByteArray)
+      val location = messagePack.read(binary, locationTemplate)
       val scrollPosX = unpacker.read(Templates.TInteger)
       val scrollPosY = unpacker.read(Templates.TInteger)
       val windowHeight = unpacker.read(Templates.TInteger)

@@ -6,4 +6,7 @@ object Implicits {
   implicit val mousePathTemplate = new MousePathTemplate
   implicit val scanningTemplate = new ScanningTemplate
   implicit val actionTemplate = new ActionTemplate
+  implicit val locationTemplate = new LocationTemplate
+  implicit val webPageTemplate = new WebPageTemplate
+  implicit val appTemplate = new AppTemplate
 }

@@ -13,8 +13,10 @@ class WebPageTemplate extends AbstractTemplate[WebPage] {
       if(required) throw new NullPointerException
       packer.writeNil
     } else {
-      packer.write(from.siteId.stuuid)
+      packer.writeArrayBegin(2)
+      packer.write(from.websiteId.stuuid)
       packer.write(from.pageId.pguuid)
+      packer.writeArrayEnd
     }
   }
 
@@ -22,9 +24,12 @@ class WebPageTemplate extends AbstractTemplate[WebPage] {
     if(!required && unpacker.trySkipNil) {
       null.asInstanceOf[WebPage]
     } else {
-      val siteId = unpacker.read(Templates.TLong)
+      unpacker.readArrayBegin
+      val websiteId = unpacker.read(Templates.TLong)
       val pageId = unpacker.read(Templates.TLong)
-      WebPage(SiteId(siteId), PageId(pageId))
+      unpacker.readArrayEnd
+
+      WebPage(WebsiteId(websiteId), PageId(pageId))
     }
   }
 }

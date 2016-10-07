@@ -7,7 +7,7 @@ import aianash.commons.events.templates._
 
 /////////////////////////////////////// Identifier classes ////////////////////////////////////////////
 
-case class SiteId(stuuid: Long) extends AnyVal
+case class WebsiteId(stuuid: Long) extends AnyVal
 case class ActivityId(actuuid: Long) extends AnyVal
 case class PageId(pguuid: Long) extends AnyVal
 case class AppId(appuuid: Long) extends AnyVal
@@ -44,8 +44,8 @@ object Location {
 }
 
 case class WebPage(
-  siteId : SiteId,
-  pageId  : PageId
+  websiteId : WebsiteId,
+  pageId    : PageId
 ) extends Location
 
 case class App(
